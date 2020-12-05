@@ -1,0 +1,5 @@
+#+TITLE: Aprendizado de maquina 2020.4
+
+Repositório da disciplina de aprendizado de maquina
+
+[[file:semana_1/ativ.org][Semana 1]]
