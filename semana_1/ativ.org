@@ -1,0 +1,349 @@
+#+TITLE: Semana 1
+#+STARTUP: overview
+
+* 1. (10 pontos)
+Faça uma lista das aplicações de AM que estão presentes na sua rotina.
+
+** Resposta
++ Reconhecimento de digitais para desbloqueio do celular
++ Análise de gostos para recomendação de vídeos (youtube), filmes (netflix) e musicas (spotify)
++ Reconhecimento de gostos pessoais para melhorar a experiencia com anúncios.
++ Calculo de frete, baseado na época do ano, preço de combustíveis.
++ Previsão metereóloga
+
+* 2. (10 pontos)
+Pesquise em canais de notícias sobre aplicações de Inteligência Artificial. Tente identificar
+se esta aplicação utiliza ou não Aprendizagem de Máquina.
+
+** Resposta
+
+*** Diagnostico de câncer de mama
+https://computerworld.com.br/negocios/inteligencia-artificial-supera-medicos-no-diagnostico-de-cancer-de-mama/
+
+Foram usadas 25856 mamografia para se treinar a IA, então foi esperado da máquina
+aprender algo.
+
+*** Suporte com pessoas viciadas em cigarro
+https://olhardigital.com.br/2020/06/01/noticias/inteligencia-artificial-e-nova-arma-brasileira-no-combate-ao-tabagismo/
+
+Talvez não seja uma aplicação com aprendizado de maquina, um chatbot pode ser escrito com
+base em análise de linguagem natural. Mas ainda assim pode ser que se pode ter sido utilizado
+alguma técnica de AM para compreensão de contextos, reconhecimento de gírias ou coisas do tipo.
+
+*** Descobrimento de antibiótico
+https://super.abril.com.br/saude/inteligencia-artificial-descobre-novo-tipo-de-antibiotico/
+
+O algoritmo foi treinado com características atômicas de 2500 medicamentos e informações sobre
+como esses medicamentos atuavam. 
+
+O algoritmo foi treinado com características atômicas de 2500 medicamentos e informações sobre
+como esses medicamentos atuavam. A partir dai o algoritmo foi capaz de gerar antibióticos com
+certas características que o faziam ser um bom antibiótico.
+
+*** Fiscalização pública
+https://agenciabrasil.ebc.com.br/geral/noticia/2020-09/tribunais-de-contas-agilizam-fiscalizacao-com-inteligencia-artificial
+
+Se encontra o uso de aprendizado de máquina quando se percebe que o algoritmo precisa
+ser ensinado sobre alguns comportamentos que podem indicar alguma irregularidade.
+
+* 3. (10 pontos)
+Selecione duas aplicações de AM. Quais atributos são utilizados por cada uma das aplicações?
+Qual o tipo de problema que a aplicação resolve, classificação, regressão ou agrupamento?
+
+** Resposta
+*** Autonomia de combustíveis
+Decidir o quanto um combustível de um veiculo irá durar é um problema de regressão que
+leva em consideração inúmeros fatores, desde a massa dentro do veiculo, a distribuição
+dessa massa, pneus em caso de carros, até condições externas, como temperatura,
+pressão, direção do vento em relação ao veiculo.
+
+*** Agrupamento de textos
+Pode se usar aprendizado de máquina para classificar textos de acordo com similaridades
+entre seus conteúdos, seja por uma pesquisa nos textos por palavras ou expressões semelhantes,
+ou ainda por regras sintáticas ou semânticas que possam ajudar a determinar "distância" entre 
+dois textos.
+
+* 4. (15 pontos)
+Em nosso país é utilizada a verificação de impressão digital para autenticar os eleitores.
+Este é um exemplo de uma aplicação da tarefa de Classificação. Cite 3 outros exemplos de
+aplicações de Classificação e explique a entrada (atributos) e a saída (classe) em cada
+caso, veja o exemplo abaixo.
+
+Exemplo:
+
++ Aplicação: verificação de impressão digital.
++ Entrada: imagem da impressão digital. Desta imagem são extraídos alguns pontos de
+interesse como cruzamento de linhas e ilhas.
++ Saída: a classe do problema só tem duas opções VERDADEIRA, quando a digital é
+equivalente àquela registrada para a pessoa, e FALSA, quando a digital é de outra pessoa.
+
+** Resposta
+
+*** Assaltos em lotéricas
++ Aplicação: detecção de situações de assaltos em lotéricas
++ Entrada: imagens das câmeras de vigilância de lotéricas, buscando por comportamentos e gestos.
++ Saída: apenas uma entre duas classes, afirmando que é uma situação de assalto ou negando essa
+situação.
+
+*** Uso de Equipamento de Proteção Individual 
++ Aplicação: verificação do uso de EPIs, seja para sistemas de alarme, ou ainda para
+geração de dados para mensurar a confiabilidade de um processo que dependa do uso de EPI.
++ Entrada: imagens das câmeras da área onde se é obrigatória (ou desejável) o uso de EPI.
++ Saída: binaria: SIM, existe alguém que não está usando EPI, ou NÃO, todos estão usando EPI.
+
+*** Tipo de mosquito
++ Aplicação: identificar especie de mosquito
++ Entrada: sons do zunido do mosquito
++ Saída: lista de possíveis espécies (dentre as especies previamente definida)
+ordenada pela confiança que o algoritmo tem sobre ser aquela espécie.
+
+* 5. (25 pontos)
+Utilize o conjunto de treino abaixo (Tabela 1, página 2) para definir um conjunto de regras
+que explique a classe do problema (Y ). Utilize as regras que você definiu para classificar
+os elementos do conjunto de teste (Tabela 2, página 2). Quantos elementos do conjunto de
+teste você consegui classificar corretamente utilizando as regras? Atenção: não vale utilizar os
+exemplos de teste para construir as regras. Não importa se acerta muitas classes, o importante
+é utilizar as regras construídas.
+
+** Resposta
+
+*** Definição dos dados
+
+#+BEGIN_SRC python :tangle atv1.py
+# Como só existem duas classes, A e B, vou usar true = A e false = B pra não usar strings
+dados_treino = [
+      (0, 0),
+      (2, 2),
+      (4, 4),
+      (6, 6),
+      (8, 6),
+      (10, 4),
+      (12, 2),
+      (2, 0),
+      (3, 1),
+      (5, 4),
+      (7, 6),
+      (8, 3),
+      (10, 1),
+      (12, 0),
+]
+
+resultados_treino = [
+      True,
+      True,
+      True,
+      True,
+      True,
+      True,
+      True,
+      False,
+      False,
+      False,
+      False,
+      False,
+      False,
+      False,
+]
+
+dados_teste = [
+      (1, 2),
+      (3, 4),
+      (5, 6),
+      (7, 7),
+      (9, 6),
+      (11, 4),
+      (2, 1),
+      (4, 2),
+      (6, 4),
+      (9, 4),
+      (11, 2),
+]
+
+resultados_teste = [
+      True,
+      True,
+      True,
+      True,
+      True,
+      True,
+      False,
+      False,
+      False,
+      False,
+      False,
+]
+#+END_SRC
+
+*** Definição das regras
+
+#+BEGIN_SRC python :tangle atv1.py
+# Vou usar um array de lambdas, cada lambda desse array é um regra
+regras = [
+        lambda xx : xx[0] >= xx[1], # Se x1 >= x2, então é um voto para a classe A, senão B
+        lambda xx : (xx[0] - xx[1]) % 2 == 0 and xx[0] % 2 == 0 and xx[1] % 2 == 0, # Se a diferença entre x1 e x2 for par e os dois forem pares, mais um voto para a classe A, senão B
+        lambda xx : xx[0] == 0, # Se x1 é zero, mais um voto para a classe A, senão B
+        lambda xx : xx[0] == 0 and xx[1] == 0, # Se os dois dados são zero, então A, senão B
+        lambda xx : not (xx[1] == 0), # Se x2 é zero, um voto para a classe B
+]
+#+END_SRC
+
+*** Aplicação das regras
+
+#+BEGIN_SRC python :tangle atv1.py
+# dados_que_vao_ser_usados = dados_treino
+# resultados_que_vao_ser_usados = resultados_treino
+
+dados_que_vao_ser_usados = dados_teste
+resultados_que_vao_ser_usados = resultados_teste
+
+# Lista de resultados
+# cada entrada dessa lista é um array
+# cada array é o resultado do dado aplicado em todas as regras,
+# ou seja, lista[3][4] é a classificação do dado dados_treino[3] pela regra regras[4]
+
+
+lista = list(map( (lambda dado : list(map( (lambda regra : regra(dado)) , regras))) , dados_que_vao_ser_usados))
+print("\nResultados:")
+print(lista)
+#+END_SRC
+
+*** Redução dos resultados
+
+
+#+BEGIN_SRC python :tangle atv1.py
+# Pra cada resultado, decide o valor pela maioria.
+# Por exemplo, se a maioria for A, então o resultado é A
+votos_apenas_pra_A = list(map(lambda resultado : list(filter(lambda entrada: entrada, resultado)), lista))
+
+# Tendo o número de votos pra A, e sabendo a quantidade de eleitores (regras), dá pra saber se o resultado é da classe A ou B
+resultado_da_votacao = list(map(lambda votos_A : len(votos_A) > (len(regras) / 2), votos_apenas_pra_A))
+
+print("\nResultados finais:")
+print(resultado_da_votacao)
+
+from functools import reduce
+numero_de_acertos = reduce(lambda a, b : a + b, list(map(lambda r : 1 if r[0] == r[1] else 0, zip(resultado_da_votacao, resultados_que_vao_ser_usados))))
+porcentagem = (numero_de_acertos / len(dados_que_vao_ser_usados)) * 100
+print("\nNumero de acertos: " + str(numero_de_acertos))
+print("\nTaxa de de acertos: " + str(porcentagem) + "%")
+print("\nTotal de dados: " + str(len(dados_que_vao_ser_usados)))
+
+#+END_SRC
+
+*** Resultados
+Minhas escolhas de regras foram péssimas, só 27% de acerto, mas pelo menos a estrutura ficou
+robusta o suficiente, acho. Mudar as regras é simples, adicionar pesos é fácil, então fica
+simples adicionar regras que caso batam, com certeza é de alguma classe.
+
+* 6. (30 pontos)
+Utilize a base de dados Car, disponível no link abaixo, e construa um conjunto de regras
+que classifique corretamente o maior número possível de exemplos. Conte quantos exemplos
+você consegue acertar. Descreva as etapas que do seu trabalho para construir este conjunto
+de regras.
+
+Dicas: a base tem 7 colunas, a mais a direita representa a classe do problema; os valores
+possíveis para a classe do problema são 4, unacc, acc, good, v-good. Não tente acertar
+100% dos exemplos, o objetivo desta atividade é implementar um conjunto de regras e avaliar
+o resultado da classificação.
+
+Endereço para os arquivos da base de dados:
+http://archive.ics.uci.edu/ml/machine-learning-databases/car/
+Base de dados: car.data.
+Informações sobre a base: car.names, car.c45-names.
+
+
+** Resposta
+
+A maior ferramenta que usei foi o seguinte comando de terminal:
+
+#+BEGIN_SRC bash
+cat car.data | awk -F, '{print $1, $2, $7}'
+#+END_SRC
+
+Pra cada linha, nesse exemplo, é printada apenas as colunas 1, 2 e 7
+
+Explorando as colunas, achei o seguinte:
+
++ Se $1 = vhigh e $2 = vhigh, então unacc 
++ Se $1 = vhigh e $2 = high, então unacc 
++ Se $1 = high e $2 = vhigh, então unacc 
++ Se $1 = med, $2 = med, $3 = 2, $4 = 2, então unacc
++ Se $3 = 4+ e $4 = 4+, então acc
++ Se $1 = med ou low, e $4 = 4 ou more, e $6 = high, então vgood
++ Se $1 = med ou low, e $2 = med ou low, e $6 = med ou high, então good
++ Se $6 = low, então unacc
+
+
+Já não tenho mais ideias pra regras.
+
+
+*** Organizando dados
+
+#+BEGIN_SRC python :tangle atv2.py
+arq_lista = open("car.data", "r")
+linhas = arq_lista.readlines()
+
+# remove \n no final
+linhas = list(map(lambda linha : linha.replace("\n", ""), linhas))
+
+# separa pelas virgulas
+linhas = list(map(lambda linha: linha.split(','), linhas))
+#+END_SRC
+
+*** Função predição
+
+#+BEGIN_SRC python :tangle atv2.py
+  def predizer(atr):
+
+      predicao = None
+
+      if atr[0] == "vhigh" and atr[1] == "vhigh":
+          predicao = "unacc"
+
+      if atr[0] == "vhigh" and atr[1] == "high":
+          predicao = "unacc"
+
+      if atr[0] == "high" and atr[1] == "vhigh":
+          predicao = "unacc"
+
+      if atr[0] == "med" and atr[1] == "med" and atr[2] == "2" and atr[3] == "2":
+          predicao = "unacc"
+
+      if (atr[2] == "4" or atr[2] == "5more") and (atr[3] == "4" or atr[3] == "more"):
+          predicao = "acc"
+
+      if (atr[0] == "med" or atr[0] == "low") and (atr[3] == "4" or atr[3] == "more") and atr[5] == "high":
+          predicao = "vgood"
+
+      if (atr[0] == "med" or atr[0] == "low") and (atr[1] == "med" or atr[1] == "low") and atr[5] == "high":
+          predicao = "good"
+
+      if atr[5] == "low":
+          predicao = "unacc"
+
+      return (predicao, atr)
+#+END_SRC
+
+*** Aplicação da predição
+
+#+BEGIN_SRC python :tangle atv2.py
+  # pra cada linha, aplica a função de predição
+  predicoes = list(map(predizer, linhas))
+#+END_SRC
+
+*** Resultados
+
+#+BEGIN_SRC python :tangle atv2.py
+  # função que retorna 1 se a predição foi certa, ou 0 caso não
+  funcao_checagem = lambda predicao : 1 if predicao[0] == predicao[1][6] else 0
+
+  from functools import reduce
+  # usa a funcao de checagem para transformar em 0 ou 1, e depois soma todo mundo, recolhendo o numero de acertos
+  numero_acertos = reduce(lambda a, b : a + b, map(funcao_checagem, predicoes))
+
+  print("Número de acertos: " + str(numero_acertos) + " de " + str(len(linhas)))
+  print("Taxa de acerto: " + str((numero_acertos) / len(linhas) * 100) + "%")
+#+END_SRC
+
+Por fim, consegui 53% de acerto, um péssimo resultado, mas foi o melhor que consegui depois
+de tentar várias combinações de regras e outras regras.
