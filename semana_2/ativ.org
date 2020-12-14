@@ -1,0 +1,783 @@
+#+TITLE: Semana 1
+#+STARTUP: overview
+
+* 1. (15 pontos)
+Utilizando a base de dados archive.ics.uci.edu/ml/datasets/iris:
+
+#+BEGIN_SRC bash
+wget -nc http://archive.ics.uci.edu/ml/machine-learning-databases/iris/iris.data
+file iris.data
+#+END_SRC
+
+#+RESULTS:
+: iris.data: CSV text
+
+
+** (a)
+Selecione os três exemplos aleatórios de cada classe e construa a matriz de distância entre
+colocando um exemplo de cada classe como elemento de conjunto de teste e os outros 6
+como conjunto de treinamento.
+
+#+BEGIN_SRC python
+  def dist(a, b):
+      arr = []
+      for i in range(4):
+          arr.append(float(a[i]) - float(b[i]))
+          arr = list(map(lambda x : x * x, arr))
+      return sum(arr) ** (1/2)
+
+  arq_lista = open("iris.data", "r")
+  linhas = list(map(lambda linha : linha.replace("\n", ""), arq_lista.readlines()))
+  linhas = list(map(lambda linha: linha.split(','), linhas))
+
+  classe_1 = linhas[4]
+  classe_2 = linhas[60]
+  classe_3 = linhas[120]
+
+  exemplo_1 = linhas[5]
+  exemplo_2 = linhas[6]
+  exemplo_3 = linhas[61]
+  exemplo_4 = linhas[62]
+  exemplo_5 = linhas[121]
+  exemplo_6 = linhas[122]
+
+
+  return [
+  (classe_1),
+  (classe_2),
+  (classe_3),
+  ["---", "---", "---", "---", "---", "---"],
+  (exemplo_1),
+  (exemplo_2),
+  (exemplo_3),
+  (exemplo_4),
+  (exemplo_5),
+  (exemplo_6),
+  ["---", "---", "---", "---", "---", "---"],
+  (dist(classe_1, exemplo_1), dist(classe_1, exemplo_2), dist(classe_1, exemplo_3), dist(classe_1, exemplo_4), dist(classe_1, exemplo_5), dist(classe_1, exemplo_6)),
+  (dist(classe_2, exemplo_1), dist(classe_2, exemplo_2), dist(classe_2, exemplo_3), dist(classe_2, exemplo_4), dist(classe_2, exemplo_5), dist(classe_2, exemplo_6)),
+  (dist(classe_3, exemplo_1), dist(classe_3, exemplo_2), dist(classe_3, exemplo_3), dist(classe_3, exemplo_4), dist(classe_3, exemplo_5), dist(classe_3, exemplo_6)),
+  ]
+
+
+#+END_SRC
+
+#+RESULTS:
+|                 5.0 |                3.6 |                1.4 |                0.2 | Iris-setosa        |                    |
+|                 5.0 |                2.0 |                3.5 |                1.0 | Iris-versicolor    |                    |
+|                 6.9 |                3.2 |                5.7 |                2.3 | Iris-virginica     |                    |
+|                 --- |                --- |                --- |                --- | ---                |                --- |
+|                 5.4 |                3.9 |                1.7 |                0.4 | Iris-setosa        |                    |
+|                 4.6 |                3.4 |                1.4 |                0.3 | Iris-setosa        |                    |
+|                 5.9 |                3.0 |                4.2 |                1.5 | Iris-versicolor    |                    |
+|                 6.0 |                2.2 |                4.0 |                1.0 | Iris-versicolor    |                    |
+|                 5.6 |                2.8 |                4.9 |                2.0 | Iris-virginica     |                    |
+|                 7.7 |                2.8 |                6.7 |                2.0 | Iris-virginica     |                    |
+|                 --- |                --- |                --- |                --- | ---                |                --- |
+| 0.21946762744589374 | 0.1000149463666786 | 7.9597549069607165 | 7.8800691976657165 | 12.388323303457609 | 2824.4356539952223 |
+|   13.44221822615214 |  5.890330295450054 | 1.2943732146816023 | 1.0307776481860673 | 2.238225697062463  | 2824.3141349820526 |
+|   30.27389112058919 |  783.3306592178446 | 2.5889191876147852 | 3.3507315647310794 | 8.187912815749726  | 1.0577347766198602 |
+
+** (b)
+Utilizando a matriz de distância explique a classificação dos exemplo de teste utilizando
+1-NN, 3-NN com peso e 3-NN sem peso.
+
+
+*** Resposta
+
+
+|                 5.0 |                3.6 |                1.4 |                0.2 | Iris-setosa        |                    |
+|                 5.0 |                2.0 |                3.5 |                1.0 | Iris-versicolor    |                    |
+|                 6.9 |                3.2 |                5.7 |                2.3 | Iris-virginica     |                    |
+|                 --- |                --- |                --- |                --- | ---                |                --- |
+|                 5.4 |                3.9 |                1.7 |                0.4 | Iris-setosa        |                    |
+|                 4.6 |                3.4 |                1.4 |                0.3 | Iris-setosa        |                    |
+|                 5.9 |                3.0 |                4.2 |                1.5 | Iris-versicolor    |                    |
+|                 6.0 |                2.2 |                4.0 |                1.0 | Iris-versicolor    |                    |
+|                 5.6 |                2.8 |                4.9 |                2.0 | Iris-virginica     |                    |
+|                 7.7 |                2.8 |                6.7 |                2.0 | Iris-virginica     |                    |
+|                 --- |                --- |                --- |                --- | ---                |                --- |
+| 0.21946762744589374 | 0.1000149463666786 | 7.9597549069607165 | 7.8800691976657165 | 12.388323303457609 | 2824.4356539952223 |
+|   13.44221822615214 |  5.890330295450054 | 1.2943732146816023 | 1.0307776481860673 | 2.238225697062463  | 2824.3141349820526 |
+|   30.27389112058919 |  783.3306592178446 | 2.5889191876147852 | 3.3507315647310794 | 8.187912815749726  | 1.0577347766198602 |
+
+
+**** 1-NN
++ teste 1: menor distancia foi 0.100 pra iris-setosa, acertou
++ teste 2: menor distancia foi 1.030 pra iris-versicolor, acertou
++ teste 3: menor distancia foi 1.057 pra iris-virginica, acertou
+
+**** 3-NN sem peso
++ teste 1: 2 votos pra iris-setosa (0.2, 0.1) e 1 pra iris-versicolor (7.8), então classificado como iris-setosa, acertou
++ teste 2: 2 votos pra iris-versicolor (1.2, 1.0) e 1 pra iris-virginica (2.2), então classificado como iris-versicolor, acertou
++ teste 3: 1 votos pra iris-virginica (1.0) e 2 pra iris-versicolor (2.5, 3.3), então classificado como iris-versicolor, ERROU
+
+**** 3-NN com peso
++ teste 1: peso 5 iris-s, peso 10 pra iris-s, peso 0.1 pra iris-vs, então iris-s, acertou
++ teste 2: peso 0.83 iris-vs, peso 1 pra iris-vs, peso 0.45 pra iris-vg, então iris-vs, acertou
++ teste 3: peso 1 iris-vg, peso 0.4 pra iris-vs, peso 0.30 pra iris-vs, então iris-vg, acertou
+
+** (c)
+Selecione duas características da base Iris plote um diagrama de dispersão colocando
+símbolos ou cores distintas para cada classe.
+
+#+begin_src python :results file
+  arq_lista = open("iris.data", "r")
+  linhas = list(map(lambda linha : linha.replace("\n", ""), arq_lista.readlines()))
+  linhas = list(map(lambda linha: linha.split(','), linhas))
+
+  iris_s = list(filter(lambda l : len (l) >= 5 and l[4] == "Iris-setosa", linhas))
+  iris_vs = list(filter(lambda l : len (l) >= 5 and l[4] == "Iris-versicolor", linhas))
+  iris_vg = list(filter(lambda l : len (l) >= 5 and l[4] == "Iris-virginica", linhas))
+
+  import matplotlib
+  import matplotlib.pyplot as plt
+
+  for iris in iris_s:
+      plt.scatter(float(iris[1]), float(iris[2]), c="green")
+
+  for iris in iris_vs:
+      plt.scatter(float(iris[1]), float(iris[2]), c="blue")
+
+      for iris in iris_vg:
+      plt.scatter(float(iris[1]), float(iris[2]), c="red")
+
+
+  fname = 'myfig.png'
+  plt.savefig(fname)
+  return fname # return this to org-mode
+#+end_src
+
+#+RESULTS:
+[[file:myfig.png]]
+* 2. (15 pontos)
+Implemente o classificador pelo vizinho mais próximo utilizando distância euclidiana. Avalie este
+classificador utilizando 10 exemplo de cada classe da base Iris como conjunto de teste e o
+restante como conjunto de treinamento.
+
+#+BEGIN_SRC python :results output
+  def dist(a, b):
+      arr = []
+      for i in range(4):
+          arr.append(float(a[i]) - float(b[i]))
+          arr = list(map(lambda x : x * x, arr))
+      return sum(arr) ** (1/2)
+
+  arq_lista = open("iris.data", "r")
+  linhas = list(map(lambda linha : linha.replace("\n", ""), arq_lista.readlines()))
+  linhas = list(map(lambda linha: linha.split(','), linhas))
+  #print(linhas[-1])
+  linhas.pop()
+  #print(linhas[-1])
+
+  # aleatoriza a ordem dos dados
+  import random
+  random.shuffle(linhas)
+  random.shuffle(linhas)
+  random.shuffle(linhas)
+
+  iris_s = list(filter(lambda l : l[4] == "Iris-setosa", linhas))[0:10]
+  iris_vs = list(filter(lambda l : l[4] == "Iris-versicolor", linhas))[0:10]
+  iris_vg = list(filter(lambda l : l[4] == "Iris-virginica", linhas))[0:10]
+
+  # teste são as 10 primeiras, aleatozadas
+  testes = []
+  testes.extend(iris_s)
+  testes.extend(iris_vs)
+  testes.extend(iris_vg)
+  random.shuffle(testes)
+
+  # treino é o resto, aleatozado
+  treino = [e for e in linhas if e not in testes]
+
+  acertos = 0
+  for teste in testes:
+      mais_proximo = min(list(map(lambda e : (dist(teste, e), e), treino)), key=lambda o : o[0])
+      #print(teste)
+      #print(mais_proximo)
+      #print("")
+      #break
+      if mais_proximo[1][4] == teste[4]:
+          acertos += 1
+
+  print("Numer de acertos: " + str(acertos) + " de " + str(len(testes)) + " testes")
+  print("Taxa de acerto: " + str(acertos / len(testes) * 100) + "%")
+
+#+END_SRC
+
+#+RESULTS:
+: Numer de acertos: 29 de 30 testes
+: Taxa de acerto: 96.66666666666667%
+* 3. (10 pontos)
+Refaça a questão anterior utilizando a distância de Minkowski, descrita abaixo.
+Calcule os resultados para p = 1, p = 2 e p = 4.
+
+
+\begin{equation*}
+        d(x_i, x_j) = \left (\sum_{k=1}^{d} |x_{ik} - x_{jk}|^p \right ) ^{\frac{1}{p}}
+\end{equation*}
+
+#+BEGIN_SRC python :results output
+  def dist(a, b, p):
+      arr = []
+      for i in range(4):
+          arr.append(float(a[i]) - float(b[i]))
+          arr = list(map(lambda x : abs(x ** p), arr))
+      return sum(arr) ** (1/p)
+
+  arq_lista = open("iris.data", "r")
+  linhas = list(map(lambda linha : linha.replace("\n", ""), arq_lista.readlines()))
+  linhas = list(map(lambda linha: linha.split(','), linhas))
+  #print(linhas[-1])
+  linhas.pop()
+  #print(linhas[-1])
+
+  # aleatoriza a ordem dos dados
+  import random
+  random.shuffle(linhas)
+  random.shuffle(linhas)
+  random.shuffle(linhas)
+
+  iris_s = list(filter(lambda l : l[4] == "Iris-setosa", linhas))[0:10]
+  iris_vs = list(filter(lambda l : l[4] == "Iris-versicolor", linhas))[0:10]
+  iris_vg = list(filter(lambda l : l[4] == "Iris-virginica", linhas))[0:10]
+
+  # teste são as 10 primeiras, aleatozadas
+  testes = []
+  testes.extend(iris_s)
+  testes.extend(iris_vs)
+  testes.extend(iris_vg)
+  random.shuffle(testes)
+
+  # treino é o resto, aleatozado
+  treino = [e for e in linhas if e not in testes]
+
+  acertos = 0
+  for teste in testes:
+      mais_proximo = min(list(map(lambda e : (dist(teste, e, 1), e), treino)), key=lambda o : o[0])
+      #print(teste)
+      #print(mais_proximo)
+      #print("")
+      #break
+      if mais_proximo[1][4] == teste[4]:
+          acertos += 1
+
+  print("[p=1] Numero de acertos: " + str(acertos) + " de " + str(len(testes)) + " testes")
+  print("[p=1] Taxa de acerto: " + str(acertos / len(testes) * 100) + "%")
+
+
+
+  acertos = 0
+  for teste in testes:
+      mais_proximo = min(list(map(lambda e : (dist(teste, e, 2), e), treino)), key=lambda o : o[0])
+      #print(teste)
+      #print(mais_proximo)
+      #print("")
+      #break
+      if mais_proximo[1][4] == teste[4]:
+          acertos += 1
+
+  print("[p=2] Numero de acertos: " + str(acertos) + " de " + str(len(testes)) + " testes")
+  print("[p=2] Taxa de acerto: " + str(acertos / len(testes) * 100) + "%")
+
+
+
+  acertos = 0
+  for teste in testes:
+      mais_proximo = min(list(map(lambda e : (dist(teste, e, 4), e), treino)), key=lambda o : o[0])
+      #print(teste)
+      #print(mais_proximo)
+      #print("")
+      #break
+      if mais_proximo[1][4] == teste[4]:
+          acertos += 1
+
+  print("[p=4] Numero de acertos: " + str(acertos) + " de " + str(len(testes)) + " testes")
+  print("[p=4] Taxa de acerto: " + str(acertos / len(testes) * 100) + "%")
+#+END_SRC
+
+#+RESULTS:
+: [p=1] Numero de acertos: 30 de 30 testes
+: [p=1] Taxa de acerto: 100.0%
+: [p=2] Numero de acertos: 29 de 30 testes
+: [p=2] Taxa de acerto: 96.66666666666667%
+: [p=4] Numero de acertos: 30 de 30 testes
+: [p=4] Taxa de acerto: 100.0%
+
+* 4. (20 pontos)
+Implemente os classificadores 7-NN com e 7-NN sem peso e avalie os classificadores
+utilizando metade dos exemplos de cada classe da base Iris como conjunto de teste e a outra
+metade como conjunto de treinamento.
+
+#+BEGIN_SRC python :results output
+  def dist(a, b, p):
+      arr = []
+      for i in range(4):
+          arr.append(float(a[i]) - float(b[i]))
+          arr = list(map(lambda x : abs(x ** p), arr))
+      return sum(arr) ** (1/p)
+
+  arq_lista = open("iris.data", "r")
+  linhas = list(map(lambda linha : linha.replace("\n", ""), arq_lista.readlines()))
+  linhas = list(map(lambda linha: linha.split(','), linhas))
+  #print(linhas[-1])
+  linhas.pop()
+  #print(linhas[-1])
+
+  # aleatoriza a ordem dos dados
+  import random
+  random.shuffle(linhas)
+  random.shuffle(linhas)
+  random.shuffle(linhas)
+
+  treino = linhas[:len(linhas)//2]
+  testes = linhas[len(linhas)//2:]
+
+  acertos = 0
+  for teste in testes:
+      lista = list(map(lambda e : (dist(teste, e, 1), e), treino))
+      lista.sort(key=lambda o : o[0])
+
+      sete_mais_proximos = lista[:7]
+      #print(sete_mais_proximos)
+      #print(teste)
+
+      iris_s = list(filter(lambda l : l[1][4] == "Iris-setosa", sete_mais_proximos))
+      iris_vs = list(filter(lambda l : l[1][4] == "Iris-versicolor", sete_mais_proximos))
+      iris_vg = list(filter(lambda l : l[1][4] == "Iris-virginica", sete_mais_proximos))
+
+      eleicao = (
+      (len(iris_s), "Iris-setosa"),
+      (len(iris_vs), "Iris-versicolor"),
+      (len(iris_vg), "Iris-virginica"),
+      )
+
+      vencedor = max(eleicao, key=lambda o : o[0])
+      #print(vencedor)
+
+      if vencedor[1] == teste[4]: acertos += 1
+      #break
+
+  print("[sem peso] Numero de acertos: " + str(acertos) + " de " + str(len(testes)) + " testes")
+  print("[sem peso] Taxa de acerto: " + str(acertos / len(testes) * 100) + "%")
+
+
+  def divv(a, b):
+      if float(b) == 0:
+          return float(a) / 0.000000000000001
+      return float(a) / float(b)
+
+
+  acertos = 0
+  for teste in testes:
+      lista = list(map(lambda e : (dist(teste, e, 1), e), treino))
+      lista.sort(key=lambda o : o[0])
+
+      sete_mais_proximos = lista[:7]
+      #print("")
+      #print(teste)
+      #print(sete_mais_proximos)
+
+
+      sete_mais_proximos_com_peso = list(map(lambda e : (divv(1, e[0]), e[1]), sete_mais_proximos))
+      maior_peso = max(sete_mais_proximos_com_peso, key=lambda o : o[0])
+      #print(sete_mais_proximos_com_peso)
+      #print(maior_peso[1][4])
+     
+
+      if maior_peso[1][4] == teste[4]: acertos += 1
+      #break
+
+  print("[com peso] Numero de acertos: " + str(acertos) + " de " + str(len(testes)) + " testes")
+  print("[com peso] Taxa de acerto: " + str(acertos / len(testes) * 100) + "%")
+
+
+#+END_SRC
+
+#+RESULTS:
+: [sem peso] Numero de acertos: 72 de 75 testes
+: [sem peso] Taxa de acerto: 96.0%
+: [com peso] Numero de acertos: 71 de 75 testes
+: [com peso] Taxa de acerto: 94.66666666666667%
+
+* 5. (10 pontos)
+Utilize uma implementação pronta (biblioteca), e compare os resultados da sua implementação
+na questão anterior com o resultado da biblioteca. Dica: você pode utilizar o sklearn
+http://scikit-learn.org/stable/modules/generated/sklearn.neighbors.KNeighborsClassifier.html.
+
+#+BEGIN_SRC python :results output
+  def dist(a, b, p):
+      arr = []
+      for i in range(4):
+          arr.append(float(a[i]) - float(b[i]))
+          arr = list(map(lambda x : abs(x ** p), arr))
+      return sum(arr) ** (1/p)
+
+  arq_lista = open("iris.data", "r")
+  linhas = list(map(lambda linha : linha.replace("\n", ""), arq_lista.readlines()))
+  linhas = list(map(lambda linha: linha.split(','), linhas))
+  #print(linhas[-1])
+  linhas.pop()
+  #print(linhas[-1])
+
+  # aleatoriza a ordem dos dados
+  import random
+  random.shuffle(linhas)
+  random.shuffle(linhas)
+  random.shuffle(linhas)
+
+  treino = linhas[:len(linhas)//2]
+  testes = linhas[len(linhas)//2:]
+
+  acertos = 0
+  for teste in testes:
+      lista = list(map(lambda e : (dist(teste, e, 1), e), treino))
+      lista.sort(key=lambda o : o[0])
+
+      sete_mais_proximos = lista[:7]
+      #print(sete_mais_proximos)
+      #print(teste)
+
+      iris_s = list(filter(lambda l : l[1][4] == "Iris-setosa", sete_mais_proximos))
+      iris_vs = list(filter(lambda l : l[1][4] == "Iris-versicolor", sete_mais_proximos))
+      iris_vg = list(filter(lambda l : l[1][4] == "Iris-virginica", sete_mais_proximos))
+
+      eleicao = (
+      (len(iris_s), "Iris-setosa"),
+      (len(iris_vs), "Iris-versicolor"),
+      (len(iris_vg), "Iris-virginica"),
+      )
+
+      vencedor = max(eleicao, key=lambda o : o[0])
+      #print(vencedor)
+
+      if vencedor[1] == teste[4]: acertos += 1
+      #break
+
+  print("[7-nn meu] Numero de acertos: " + str(acertos) + " de " + str(len(testes)) + " testes")
+  print("[7-nn meu] Taxa de acerto: " + str(acertos / len(testes) * 100) + "%")
+
+
+  # remove classificação
+  treino_x = list(map(lambda e : e[:-1], treino))
+  # transforma em floats
+  treino_x = list(map(lambda e : list(map(lambda o : float(o), e)), treino_x))
+  # só as classificação
+  treino_y = list(map(lambda e : e[-1], treino))
+
+
+  # remove classificação
+  teste_x = list(map(lambda e : e[:-1], testes))
+  # transforma em floats
+  teste_x = list(map(lambda e : list(map(lambda o : float(o), e)), teste_x))
+  # só as classificação
+  teste_y = list(map(lambda e : e[-1], testes))
+  
+
+  from sklearn.neighbors import KNeighborsClassifier
+  knn_7 = KNeighborsClassifier(n_neighbors=7)
+  knn_7.fit(treino_x, treino_y)
+  
+  teste = zip(teste_x, teste_y)
+
+  acertos = 0
+  for t in teste:
+      if knn_7.predict([t[0]])[0] == t[1]:
+          acertos += 1
+
+  print("[7-nn skl] Numero de acertos: " + str(acertos) + " de " + str(len(testes)) + " testes")
+  print("[7-nn skl] Taxa de acerto: " + str(acertos / len(testes) * 100) + "%")
+
+#+END_SRC
+
+#+RESULTS:
+: [7-nn meu] Numero de acertos: 73 de 75 testes
+: [7-nn meu] Taxa de acerto: 97.33333333333334%
+: [7-nn skl] Numero de acertos: 74 de 75 testes
+: [7-nn skl] Taxa de acerto: 98.66666666666667%
+* 6. (10 pontos)
+Divida a base Wine http://archive.ics.uci.edu/ml/datasets/Wine utilizando 50% da classe para
+treino e o restante para teste. Avalie vários valores de k e determine qual é aquele
+que gera a maior taxa de acerto.
+Dica: note que a primeira coluna da base descreve as classes do problema. São 59 exemplos da
+classe 1, 71 da classe 2 e 48 da classe 3. Pode utilizar biblioteca.
+
+
+#+BEGIN_SRC bash
+wget -nc http://archive.ics.uci.edu/ml/machine-learning-databases/wine/wine.data
+file wine.data
+#+END_SRC
+
+#+RESULTS:
+: wine.data: CSV text
+
+
+
+#+BEGIN_SRC python :results value
+
+  arq_lista = open("wine.data", "r")
+  linhas = list(map(lambda linha : linha.replace("\n", ""), arq_lista.readlines()))
+  linhas = list(map(lambda linha: linha.split(','), linhas))
+
+  # aleatoriza a ordem dos dados
+  import random
+  random.shuffle(linhas)
+  random.shuffle(linhas)
+  random.shuffle(linhas)
+
+  treino = linhas[:len(linhas)//2]
+  testes = linhas[len(linhas)//2:]
+
+  # remove classificação
+  treino_x = list(map(lambda e : e[1:], treino))
+  # transforma em floats
+  treino_x = list(map(lambda e : list(map(lambda o : float(o), e)), treino_x))
+  # só as classificação
+  treino_y = list(map(lambda e : e[0], treino))
+
+
+
+  # remove classificação
+  teste_x = list(map(lambda e : e[1:], testes))
+  # transforma em floats
+  teste_x = list(map(lambda e : list(map(lambda o : float(o), e)), teste_x))
+  # só as classificação
+  teste_y = list(map(lambda e : e[0], testes))
+
+
+  from sklearn.neighbors import KNeighborsClassifier
+ 
+
+  ks = range(1, 51)
+  resultados = []
+
+  for k in ks:
+      knn = KNeighborsClassifier(n_neighbors=k)
+      knn.fit(treino_x, treino_y)
+      teste = zip(teste_x, teste_y)
+      acertos = 0
+      for t in teste:
+          if knn.predict([t[0]])[0] == t[1]: acertos += 1
+
+      resultados.append((k, acertos, acertos / len(testes) * 100))
+
+
+  resultados.sort(key=lambda a : a[2])
+  resultados.reverse()
+
+
+
+  import matplotlib
+  import matplotlib.pyplot as plt
+
+  for r in resultados: plt.scatter(r[0], r[2])
+
+  fname = 'knns.png'
+  plt.savefig(fname)
+  return resultados
+#+END_SRC
+
+#+RESULTS:
+| 30 | 60 | 67.41573033707866 |
+| 21 | 60 | 67.41573033707866 |
+| 11 | 60 | 67.41573033707866 |
+| 32 | 59 | 66.29213483146067 |
+| 29 | 59 | 66.29213483146067 |
+| 28 | 59 | 66.29213483146067 |
+| 24 | 59 | 66.29213483146067 |
+|  6 | 59 | 66.29213483146067 |
+|  3 | 59 | 66.29213483146067 |
+| 33 | 58 |  65.1685393258427 |
+| 31 | 58 |  65.1685393258427 |
+| 27 | 58 |  65.1685393258427 |
+| 22 | 58 |  65.1685393258427 |
+|  7 | 58 |  65.1685393258427 |
+|  1 | 58 |  65.1685393258427 |
+| 38 | 57 | 64.04494382022472 |
+| 26 | 57 | 64.04494382022472 |
+| 25 | 57 | 64.04494382022472 |
+| 20 | 57 | 64.04494382022472 |
+| 19 | 57 | 64.04494382022472 |
+| 17 | 57 | 64.04494382022472 |
+| 13 | 57 | 64.04494382022472 |
+|  9 | 57 | 64.04494382022472 |
+|  5 | 57 | 64.04494382022472 |
+| 41 | 56 | 62.92134831460674 |
+| 39 | 56 | 62.92134831460674 |
+| 37 | 56 | 62.92134831460674 |
+| 36 | 56 | 62.92134831460674 |
+| 23 | 56 | 62.92134831460674 |
+| 15 | 56 | 62.92134831460674 |
+| 12 | 56 | 62.92134831460674 |
+|  8 | 56 | 62.92134831460674 |
+| 44 | 55 | 61.79775280898876 |
+| 43 | 55 | 61.79775280898876 |
+| 42 | 55 | 61.79775280898876 |
+| 40 | 55 | 61.79775280898876 |
+| 35 | 55 | 61.79775280898876 |
+| 34 | 55 | 61.79775280898876 |
+| 18 | 55 | 61.79775280898876 |
+| 16 | 55 | 61.79775280898876 |
+| 10 | 55 | 61.79775280898876 |
+| 50 | 54 | 60.67415730337079 |
+| 49 | 54 | 60.67415730337079 |
+| 48 | 54 | 60.67415730337079 |
+| 47 | 54 | 60.67415730337079 |
+| 46 | 54 | 60.67415730337079 |
+| 45 | 54 | 60.67415730337079 |
+| 14 | 54 | 60.67415730337079 |
+|  4 | 54 | 60.67415730337079 |
+|  2 | 52 | 58.42696629213483 |
+
+[[file:knns.png]]
+
+* 7. (10 pontos)
+Refaça o experimento da questão anterior removendo a última coluna da base.
+
+#+BEGIN_SRC bash
+wget -nc http://archive.ics.uci.edu/ml/machine-learning-databases/wine/wine.data
+file wine.data
+#+END_SRC
+
+#+RESULTS:
+: wine.data: CSV text
+
+
+
+#+BEGIN_SRC python :results value
+
+  arq_lista = open("wine.data", "r")
+  linhas = list(map(lambda linha : linha.replace("\n", ""), arq_lista.readlines()))
+  linhas = list(map(lambda linha: linha.split(','), linhas))
+
+  # aleatoriza a ordem dos dados
+  import random
+  random.shuffle(linhas)
+  random.shuffle(linhas)
+  random.shuffle(linhas)
+
+  treino = linhas[:len(linhas)//2]
+  testes = linhas[len(linhas)//2:]
+
+  # remove classificação
+  treino_x = list(map(lambda e : e[1:-1], treino))
+  # transforma em floats
+  treino_x = list(map(lambda e : list(map(lambda o : float(o), e)), treino_x))
+  # só as classificação
+  treino_y = list(map(lambda e : e[0], treino))
+
+
+  # remove classificação
+  teste_x = list(map(lambda e : e[1:-1], testes))
+  # transforma em floats
+  teste_x = list(map(lambda e : list(map(lambda o : float(o), e)), teste_x))
+  # só as classificação
+  teste_y = list(map(lambda e : e[0], testes))
+
+
+  from sklearn.neighbors import KNeighborsClassifier
+ 
+
+  ks = range(1, 51)
+  resultados = []
+
+  for k in ks:
+      knn = KNeighborsClassifier(n_neighbors=k)
+      knn.fit(treino_x, treino_y)
+      teste = zip(teste_x, teste_y)
+      acertos = 0
+      for t in teste:
+          if knn.predict([t[0]])[0] == t[1]: acertos += 1
+
+      resultados.append((k, acertos, acertos / len(testes) * 100))
+
+
+  resultados.sort(key=lambda a : a[2])
+  resultados.reverse()
+
+
+
+  import matplotlib
+  import matplotlib.pyplot as plt
+
+  for r in resultados: plt.scatter(r[0], r[2])
+
+  fname = 'knns2.png'
+  plt.savefig(fname)
+  return resultados
+#+END_SRC
+
+#+RESULTS:
+|  1 | 78 | 87.64044943820225 |
+|  9 | 77 | 86.51685393258427 |
+|  8 | 76 | 85.39325842696628 |
+|  6 | 76 | 85.39325842696628 |
+|  5 | 76 | 85.39325842696628 |
+|  4 | 76 | 85.39325842696628 |
+|  2 | 76 | 85.39325842696628 |
+|  3 | 75 | 84.26966292134831 |
+| 11 | 74 | 83.14606741573034 |
+| 10 | 74 | 83.14606741573034 |
+|  7 | 74 | 83.14606741573034 |
+| 17 | 72 | 80.89887640449437 |
+| 15 | 72 | 80.89887640449437 |
+| 18 | 71 |  79.7752808988764 |
+| 13 | 71 |  79.7752808988764 |
+| 12 | 71 |  79.7752808988764 |
+| 21 | 70 | 78.65168539325843 |
+| 20 | 70 | 78.65168539325843 |
+| 19 | 70 | 78.65168539325843 |
+| 16 | 70 | 78.65168539325843 |
+| 14 | 70 | 78.65168539325843 |
+| 28 | 69 | 77.52808988764045 |
+| 27 | 69 | 77.52808988764045 |
+| 25 | 69 | 77.52808988764045 |
+| 26 | 68 | 76.40449438202246 |
+| 24 | 68 | 76.40449438202246 |
+| 23 | 68 | 76.40449438202246 |
+| 22 | 68 | 76.40449438202246 |
+| 36 | 66 | 74.15730337078652 |
+| 31 | 66 | 74.15730337078652 |
+| 29 | 66 | 74.15730337078652 |
+| 37 | 65 | 73.03370786516854 |
+| 34 | 65 | 73.03370786516854 |
+| 33 | 65 | 73.03370786516854 |
+| 32 | 65 | 73.03370786516854 |
+| 38 | 64 | 71.91011235955057 |
+| 30 | 64 | 71.91011235955057 |
+| 39 | 63 | 70.78651685393258 |
+| 35 | 63 | 70.78651685393258 |
+| 43 | 61 | 68.53932584269663 |
+| 40 | 61 | 68.53932584269663 |
+| 45 | 60 | 67.41573033707866 |
+| 44 | 60 | 67.41573033707866 |
+| 41 | 60 | 67.41573033707866 |
+| 48 | 59 | 66.29213483146067 |
+| 47 | 59 | 66.29213483146067 |
+| 46 | 59 | 66.29213483146067 |
+| 42 | 59 | 66.29213483146067 |
+| 50 | 58 |  65.1685393258427 |
+| 49 | 58 |  65.1685393258427 |
+
+[[file:knns.png]]
+
+* 8. (10 pontos)
+Descreva um problema para o qual seria adequado utilizar o k-NN e descreva um problema
+para o qual não seria adequado utilizar o classificador. Explique seus motivos.
+
+** Adequado
++ Qualquer dataset razoalvelmente pequeno para "treino"
++ Poucos atributos (baixa dimensionalidade)
++ Baixa correlação entre atributos
+
++ Fazenda que produz mangas e laranjas, indentificar na esteira se é manga ou
+laranja baseado no peso , cor, e tamanho.
+    + Atributos sem relação
+    + Clara distinção entre (pelo menos 2) os atributos
+
+** Não adequado
+
++ Reconhecimento de uma tal pessoa em uma foto
+  + Muitos atributos?
+  + Dataset gigante com imagens em varios contextos
+  + Provavel que um erro muito grande
