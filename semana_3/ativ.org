@@ -1,0 +1,1166 @@
+* DONE 1. (10 pontos)
+Qual é o melhor classificador?
+
+** Resposta
++ Qual o problema que vai ser resolvido?
++ Qual o tipo de dado?
++ Tem restrições quanto ao tempo de classificação?
++ Classificação como?
+  + classificador muito ou pouco preciso?
+  + Gasta mais tempo no treino ou na aplicação?
+
+* DONE 2. (5 pontos)
+De que forma um classificador pode ser avaliado qualitativamente?
+
+** Resposta
+*** Capacidade de um humano interpretar (interpretabilidade)
+Interpretar o modelo que o  classificador utiliza, facilitando a compreensão
+de como o classificador funciona, e potencialmente ajudando a decidir o classificador
+que será usado.
+*** Capacidade de gerar a probabilidade do acerto
+Talvez o classificador não classifique de fato, apenas ofereça uma opinião com
+n% de certeza sobre a classificação, ajudando o usuário, seja uma pessoa ou seja
+outro classificador.
+*** Capacidade de uso de dados de baixo nível
+Se é capaz de usar dados com pouca interpretação previa, como imagens. Um modelo,
+ainda compreensível, porém cru.
+* DONE 3. (22 pontos) [11/11]
+Realize um Holdout com 1-NN (distância Euclidiana), utilizando 50% dos dados
+para treinamento e o restante para teste na base de dados Iris archive.ics.uci.edu/ml/
+datasets/iris.
+
+#+BEGIN_SRC bash
+wget -nc http://archive.ics.uci.edu/ml/machine-learning-databases/iris/iris.data
+file iris.data
+#+END_SRC
+
+assumido holdout completamente aleatório
+#+BEGIN_SRC python :session segundo :results output
+def dist(a, b, p):
+    arr = []
+    for i in range(min(len(a), len(b))):
+        arr.append(abs(float(a[i]) - float(b[i])))
+    arr = list(map(lambda x : x ** p, arr))
+    return sum(arr) ** (1/p)
+
+
+arq_lista = open("iris.data", "r")
+linhas = list(map(lambda linha : linha.replace("\n", ""), arq_lista.readlines()))
+linhas = list(map(lambda linha: linha.split(','), linhas))
+#print(linhas[-1])
+linhas.pop()
+#print(linhas[-1])
+
+# aleatoriza a ordem dos dados
+import random
+random.shuffle(linhas)
+random.shuffle(linhas)
+random.shuffle(linhas)
+
+treino = linhas[:len(linhas)//2]
+testes = linhas[len(linhas)//2:]
+
+#+END_SRC
+
+#+RESULTS:
+
+
+** DONE (a)
+Mostre uma tabela a classe correta de cada exemplo do conjunto de teste ao lado da saída
+do seu classificador. Utilize esta tabela para calcular o itens descritos a seguir.
+
+#+BEGIN_SRC python :session segundo :results output
+resultados = []
+
+for teste in testes:
+    mais_proximo = min(list(map(lambda e : (dist(teste[:-1], e, 2), e), treino[:-1])), key=lambda o : o[0])
+    #print(teste)
+    #print(mais_proximo)
+    #print("")
+    #break
+
+    resultados.append((teste, mais_proximo[1][4]))
+
+print(resultados)
+
+for i in range(len(resultados)):
+    print("Teste " + str(i) + ", classe real :" + resultados[i][0][4] + ", classificado como: " + resultados[i][1])
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+[(['5.5', '2.4', '3.7', '1.0', 'Iris-versicolor'], 'Iris-versicolor'), (['4.8', '3.0', '1.4', '0.1', 'Iris-setosa'], 'Iris-setosa'), (['6.1', '2.8', '4.0', '1.3', 'Iris-versicolor'], 'Iris-versicolor'), (['6.6', '2.9', '4.6', '1.3', 'Iris-versicolor'], 'Iris-versicolor'), (['6.4', '3.2', '5.3', '2.3', 'Iris-virginica'], 'Iris-virginica'), (['6.5', '3.2', '5.1', '2.0', 'Iris-virginica'], 'Iris-virginica'), (['7.7', '2.6', '6.9', '2.3', 'Iris-virginica'], 'Iris-virginica'), (['5.8', '2.7', '5.1', '1.9', 'Iris-virginica'], 'Iris-virginica'), (['6.7', '3.1', '4.7', '1.5', 'Iris-versicolor'], 'Iris-versicolor'), (['5.9', '3.2', '4.8', '1.8', 'Iris-versicolor'], 'Iris-virginica'), (['5.0', '3.0', '1.6', '0.2', 'Iris-setosa'], 'Iris-setosa'), (['4.4', '2.9', '1.4', '0.2', 'Iris-setosa'], 'Iris-setosa'), (['4.4', '3.2', '1.3', '0.2', 'Iris-setosa'], 'Iris-setosa'), (['5.1', '3.8', '1.5', '0.3', 'Iris-setosa'], 'Iris-setosa'), (['4.9', '2.4', '3.3', '1.0', 'Iris-versicolor'], 'Iris-versicolor'), (['6.7', '3.1', '5.6', '2.4', 'Iris-virginica'], 'Iris-virginica'), (['4.9', '3.0', '1.4', '0.2', 'Iris-setosa'], 'Iris-setosa'), (['5.0', '3.5', '1.6', '0.6', 'Iris-setosa'], 'Iris-setosa'), (['5.4', '3.9', '1.3', '0.4', 'Iris-setosa'], 'Iris-setosa'), (['4.9', '3.1', '1.5', '0.1', 'Iris-setosa'], 'Iris-setosa'), (['6.7', '3.1', '4.4', '1.4', 'Iris-versicolor'], 'Iris-versicolor'), (['5.7', '2.5', '5.0', '2.0', 'Iris-virginica'], 'Iris-virginica'), (['5.6', '2.9', '3.6', '1.3', 'Iris-versicolor'], 'Iris-versicolor'), (['6.6', '3.0', '4.4', '1.4', 'Iris-versicolor'], 'Iris-versicolor'), (['5.2', '2.7', '3.9', '1.4', 'Iris-versicolor'], 'Iris-versicolor'), (['4.8', '3.4', '1.9', '0.2', 'Iris-setosa'], 'Iris-setosa'), (['5.1', '3.5', '1.4', '0.2', 'Iris-setosa'], 'Iris-setosa'), (['5.1', '3.8', '1.6', '0.2', 'Iris-setosa'], 'Iris-setosa'), (['5.2', '4.1', '1.5', '0.1', 'Iris-setosa'], 'Iris-setosa'), (['7.7', '3.8', '6.7', '2.2', 'Iris-virginica'], 'Iris-virginica'), (['6.4', '2.8', '5.6', '2.2', 'Iris-virginica'], 'Iris-virginica'), (['6.2', '2.9', '4.3', '1.3', 'Iris-versicolor'], 'Iris-versicolor'), (['5.8', '2.7', '5.1', '1.9', 'Iris-virginica'], 'Iris-virginica'), (['6.0', '2.7', '5.1', '1.6', 'Iris-versicolor'], 'Iris-virginica'), (['4.9', '3.1', '1.5', '0.1', 'Iris-setosa'], 'Iris-setosa'), (['5.1', '2.5', '3.0', '1.1', 'Iris-versicolor'], 'Iris-versicolor'), (['5.9', '3.0', '4.2', '1.5', 'Iris-versicolor'], 'Iris-versicolor'), (['5.5', '4.2', '1.4', '0.2', 'Iris-setosa'], 'Iris-setosa'), (['5.8', '2.8', '5.1', '2.4', 'Iris-virginica'], 'Iris-virginica'), (['5.8', '4.0', '1.2', '0.2', 'Iris-setosa'], 'Iris-setosa'), (['5.5', '2.6', '4.4', '1.2', 'Iris-versicolor'], 'Iris-versicolor'), (['6.1', '3.0', '4.9', '1.8', 'Iris-virginica'], 'Iris-virginica'), (['5.4', '3.4', '1.7', '0.2', 'Iris-setosa'], 'Iris-setosa'), (['5.6', '3.0', '4.5', '1.5', 'Iris-versicolor'], 'Iris-versicolor'), (['6.9', '3.1', '5.4', '2.1', 'Iris-virginica'], 'Iris-virginica'), (['6.3', '2.7', '4.9', '1.8', 'Iris-virginica'], 'Iris-virginica'), (['4.6', '3.6', '1.0', '0.2', 'Iris-setosa'], 'Iris-setosa'), (['5.8', '2.7', '3.9', '1.2', 'Iris-versicolor'], 'Iris-versicolor'), (['4.8', '3.4', '1.6', '0.2', 'Iris-setosa'], 'Iris-setosa'), (['6.5', '3.0', '5.8', '2.2', 'Iris-virginica'], 'Iris-virginica'), (['5.0', '3.5', '1.3', '0.3', 'Iris-setosa'], 'Iris-setosa'), (['7.3', '2.9', '6.3', '1.8', 'Iris-virginica'], 'Iris-virginica'), (['6.3', '2.9', '5.6', '1.8', 'Iris-virginica'], 'Iris-virginica'), (['7.2', '3.2', '6.0', '1.8', 'Iris-virginica'], 'Iris-virginica'), (['7.2', '3.0', '5.8', '1.6', 'Iris-virginica'], 'Iris-virginica'), (['6.3', '2.5', '5.0', '1.9', 'Iris-virginica'], 'Iris-virginica'), (['6.3', '2.3', '4.4', '1.3', 'Iris-versicolor'], 'Iris-versicolor'), (['6.7', '3.3', '5.7', '2.5', 'Iris-virginica'], 'Iris-virginica'), (['5.0', '3.4', '1.6', '0.4', 'Iris-setosa'], 'Iris-setosa'), (['5.5', '2.5', '4.0', '1.3', 'Iris-versicolor'], 'Iris-versicolor'), (['5.4', '3.9', '1.7', '0.4', 'Iris-setosa'], 'Iris-setosa'), (['5.7', '2.9', '4.2', '1.3', 'Iris-versicolor'], 'Iris-versicolor'), (['4.9', '3.1', '1.5', '0.1', 'Iris-setosa'], 'Iris-setosa'), (['6.4', '2.7', '5.3', '1.9', 'Iris-virginica'], 'Iris-virginica'), (['6.8', '3.0', '5.5', '2.1', 'Iris-virginica'], 'Iris-virginica'), (['6.5', '2.8', '4.6', '1.5', 'Iris-versicolor'], 'Iris-versicolor'), (['5.4', '3.4', '1.5', '0.4', 'Iris-setosa'], 'Iris-setosa'), (['6.9', '3.2', '5.7', '2.3', 'Iris-virginica'], 'Iris-virginica'), (['5.8', '2.7', '4.1', '1.0', 'Iris-versicolor'], 'Iris-versicolor'), (['6.9', '3.1', '5.1', '2.3', 'Iris-virginica'], 'Iris-virginica'), (['6.9', '3.1', '4.9', '1.5', 'Iris-versicolor'], 'Iris-versicolor'), (['4.6', '3.4', '1.4', '0.3', 'Iris-setosa'], 'Iris-setosa'), (['6.8', '3.2', '5.9', '2.3', 'Iris-virginica'], 'Iris-virginica'), (['7.1', '3.0', '5.9', '2.1', 'Iris-virginica'], 'Iris-virginica'), (['6.1', '2.6', '5.6', '1.4', 'Iris-virginica'], 'Iris-virginica')]
+Teste 0, classe real :Iris-versicolor, classificado como: Iris-versicolor
+Teste 1, classe real :Iris-setosa, classificado como: Iris-setosa
+Teste 2, classe real :Iris-versicolor, classificado como: Iris-versicolor
+Teste 3, classe real :Iris-versicolor, classificado como: Iris-versicolor
+Teste 4, classe real :Iris-virginica, classificado como: Iris-virginica
+Teste 5, classe real :Iris-virginica, classificado como: Iris-virginica
+Teste 6, classe real :Iris-virginica, classificado como: Iris-virginica
+Teste 7, classe real :Iris-virginica, classificado como: Iris-virginica
+Teste 8, classe real :Iris-versicolor, classificado como: Iris-versicolor
+Teste 9, classe real :Iris-versicolor, classificado como: Iris-virginica
+Teste 10, classe real :Iris-setosa, classificado como: Iris-setosa
+Teste 11, classe real :Iris-setosa, classificado como: Iris-setosa
+Teste 12, classe real :Iris-setosa, classificado como: Iris-setosa
+Teste 13, classe real :Iris-setosa, classificado como: Iris-setosa
+Teste 14, classe real :Iris-versicolor, classificado como: Iris-versicolor
+Teste 15, classe real :Iris-virginica, classificado como: Iris-virginica
+Teste 16, classe real :Iris-setosa, classificado como: Iris-setosa
+Teste 17, classe real :Iris-setosa, classificado como: Iris-setosa
+Teste 18, classe real :Iris-setosa, classificado como: Iris-setosa
+Teste 19, classe real :Iris-setosa, classificado como: Iris-setosa
+Teste 20, classe real :Iris-versicolor, classificado como: Iris-versicolor
+Teste 21, classe real :Iris-virginica, classificado como: Iris-virginica
+Teste 22, classe real :Iris-versicolor, classificado como: Iris-versicolor
+Teste 23, classe real :Iris-versicolor, classificado como: Iris-versicolor
+Teste 24, classe real :Iris-versicolor, classificado como: Iris-versicolor
+Teste 25, classe real :Iris-setosa, classificado como: Iris-setosa
+Teste 26, classe real :Iris-setosa, classificado como: Iris-setosa
+Teste 27, classe real :Iris-setosa, classificado como: Iris-setosa
+Teste 28, classe real :Iris-setosa, classificado como: Iris-setosa
+Teste 29, classe real :Iris-virginica, classificado como: Iris-virginica
+Teste 30, classe real :Iris-virginica, classificado como: Iris-virginica
+Teste 31, classe real :Iris-versicolor, classificado como: Iris-versicolor
+Teste 32, classe real :Iris-virginica, classificado como: Iris-virginica
+Teste 33, classe real :Iris-versicolor, classificado como: Iris-virginica
+Teste 34, classe real :Iris-setosa, classificado como: Iris-setosa
+Teste 35, classe real :Iris-versicolor, classificado como: Iris-versicolor
+Teste 36, classe real :Iris-versicolor, classificado como: Iris-versicolor
+Teste 37, classe real :Iris-setosa, classificado como: Iris-setosa
+Teste 38, classe real :Iris-virginica, classificado como: Iris-virginica
+Teste 39, classe real :Iris-setosa, classificado como: Iris-setosa
+Teste 40, classe real :Iris-versicolor, classificado como: Iris-versicolor
+Teste 41, classe real :Iris-virginica, classificado como: Iris-virginica
+Teste 42, classe real :Iris-setosa, classificado como: Iris-setosa
+Teste 43, classe real :Iris-versicolor, classificado como: Iris-versicolor
+Teste 44, classe real :Iris-virginica, classificado como: Iris-virginica
+Teste 45, classe real :Iris-virginica, classificado como: Iris-virginica
+Teste 46, classe real :Iris-setosa, classificado como: Iris-setosa
+Teste 47, classe real :Iris-versicolor, classificado como: Iris-versicolor
+Teste 48, classe real :Iris-setosa, classificado como: Iris-setosa
+Teste 49, classe real :Iris-virginica, classificado como: Iris-virginica
+Teste 50, classe real :Iris-setosa, classificado como: Iris-setosa
+Teste 51, classe real :Iris-virginica, classificado como: Iris-virginica
+Teste 52, classe real :Iris-virginica, classificado como: Iris-virginica
+Teste 53, classe real :Iris-virginica, classificado como: Iris-virginica
+Teste 54, classe real :Iris-virginica, classificado como: Iris-virginica
+Teste 55, classe real :Iris-virginica, classificado como: Iris-virginica
+Teste 56, classe real :Iris-versicolor, classificado como: Iris-versicolor
+Teste 57, classe real :Iris-virginica, classificado como: Iris-virginica
+Teste 58, classe real :Iris-setosa, classificado como: Iris-setosa
+Teste 59, classe real :Iris-versicolor, classificado como: Iris-versicolor
+Teste 60, classe real :Iris-setosa, classificado como: Iris-setosa
+Teste 61, classe real :Iris-versicolor, classificado como: Iris-versicolor
+Teste 62, classe real :Iris-setosa, classificado como: Iris-setosa
+Teste 63, classe real :Iris-virginica, classificado como: Iris-virginica
+Teste 64, classe real :Iris-virginica, classificado como: Iris-virginica
+Teste 65, classe real :Iris-versicolor, classificado como: Iris-versicolor
+Teste 66, classe real :Iris-setosa, classificado como: Iris-setosa
+Teste 67, classe real :Iris-virginica, classificado como: Iris-virginica
+Teste 68, classe real :Iris-versicolor, classificado como: Iris-versicolor
+Teste 69, classe real :Iris-virginica, classificado como: Iris-virginica
+Teste 70, classe real :Iris-versicolor, classificado como: Iris-versicolor
+Teste 71, classe real :Iris-setosa, classificado como: Iris-setosa
+Teste 72, classe real :Iris-virginica, classificado como: Iris-virginica
+Teste 73, classe real :Iris-virginica, classificado como: Iris-virginica
+Teste 74, classe real :Iris-virginica, classificado como: Iris-virginica
+#+end_example
+
+** DONE (b)
+Calcule a matriz de confusão.
+
+#+BEGIN_SRC python :session segundo :results output
+classes_reais = [None, None, None]
+classes_reais[0] = list(filter(lambda l : l[0][4] == "Iris-setosa", resultados))
+classes_reais[1] = list(filter(lambda l : l[0][4] == "Iris-versicolor", resultados))
+classes_reais[2] = list(filter(lambda l : l[0][4] == "Iris-virginica", resultados))
+print(classes_reais[0][0])
+matriz = [[0, 0, 0],[0, 0, 0],[0, 0, 0]]
+
+for i in range(len(matriz)):
+    for teste in classes_reais[i]:
+        if teste[1] == "Iris-setosa":
+            matriz[i][0] += 1
+        if teste[1] == "Iris-versicolor":
+            matriz[i][1] += 1
+        if teste[1] == "Iris-virginica":
+            matriz[i][2] += 1
+
+   
+for i in range(len(matriz)):
+    print(matriz[i])
+
+#+END_SRC
+
+#+RESULTS:
+: (['4.8', '3.0', '1.4', '0.1', 'Iris-setosa'], 'Iris-setosa')
+: [25, 0, 0]
+: [0, 21, 2]
+: [0, 0, 27]
+
+** DONE (c)
+Calcule o Recall por classe.
+
+#+BEGIN_SRC python :session segundo :results output
+print("Classe 0 é iris-setosa")
+print("Classe 1 é iris-versicolor")
+print("Classe 2 é iris-virginica")
+
+recall_por_classe = []
+
+
+for linha in range(len(matriz)):
+    diagonal = matriz[linha][linha]
+    soma = sum(matriz[linha])
+    recall_por_classe.append(diagonal/soma)
+    print("Recall pra classe " + str(linha) + " é " + str(diagonal/soma))
+#+END_SRC
+
+#+RESULTS:
+: Classe 0 é iris-setosa
+: Classe 1 é iris-versicolor
+: Classe 2 é iris-virginica
+: Recall pra classe 0 é 1.0
+: Recall pra classe 1 é 0.9130434782608695
+: Recall pra classe 2 é 1.0
+
+** DONE (d)
+Calcule a Taxa de acerto do classificador (média ponderada do Recall).
+
+#+BEGIN_SRC python :session segundo :results output
+print("Classe 0 é iris-setosa")
+print("Classe 1 é iris-versicolor")
+print("Classe 2 é iris-virginica")
+
+
+pesos = [
+len(list(filter(lambda l : l[4] == "Iris-setosa", linhas))),
+len(list(filter(lambda l : l[4] == "Iris-versicolor", linhas))),
+len(list(filter(lambda l : l[4] == "Iris-virginica", linhas))),
+]
+
+soma_ponderada = 0
+for linha in range(len(matriz)):
+    diagonal = matriz[linha][linha]
+    soma = sum(matriz[linha])
+    soma_ponderada += pesos[linha] * (diagonal/soma)
+    print("Recall pra classe " + str(linha) + " é " + str(diagonal/soma))
+
+print("Taxa de acerto: " + str(soma_ponderada / sum(pesos)))
+media_ponderada_recall = soma_ponderada / sum(pesos)
+#+END_SRC
+
+#+RESULTS:
+: Classe 0 é iris-setosa
+: Classe 1 é iris-versicolor
+: Classe 2 é iris-virginica
+: Recall pra classe 0 é 1.0
+: Recall pra classe 1 é 0.9130434782608695
+: Recall pra classe 2 é 1.0
+: Taxa de acerto: 0.9710144927536232
+
+** DONE (e)
+Calcule a Precisão por classe.
+
+#+BEGIN_SRC python :session segundo :results output
+print("Classe 0 é iris-setosa")
+print("Classe 1 é iris-versicolor")
+print("Classe 2 é iris-virginica")
+
+precisao_por_classe = []
+for linha in range(len(matriz)):
+    soma_p = 0
+    for i in range(len(matriz)):
+        soma_p += matriz[i][linha]
+    diagonal = matriz[linha][linha]
+    precisao_por_classe.append(diagonal/soma_p)
+
+    print("Precisão pra classe " + str(linha) + " é " + str(diagonal/soma_p))
+#+END_SRC
+
+#+RESULTS:
+: Classe 0 é iris-setosa
+: Classe 1 é iris-versicolor
+: Classe 2 é iris-virginica
+: Precisão pra classe 0 é 1.0
+: Precisão pra classe 1 é 1.0
+: Precisão pra classe 2 é 0.9310344827586207
+
+** DONE (f)
+Calcule a média ponderada da Precisão.
+
+#+BEGIN_SRC python :session segundo :results output
+print("Classe 0 é iris-setosa")
+print("Classe 1 é iris-versicolor")
+print("Classe 2 é iris-virginica")
+
+soma_ponderada = 0
+for linha in range(len(matriz)):
+    soma_p = 0
+    for i in range(len(matriz)):
+        soma_p += matriz[i][linha]
+    diagonal = matriz[linha][linha]
+    soma_ponderada += pesos[linha] * (diagonal/soma_p)
+
+    print("Precisão pra classe " + str(linha) + " é " + str(diagonal/soma_p))
+
+print("Média ponderada da precisão: " + str(soma_ponderada / sum(pesos)))
+#+END_SRC
+
+#+RESULTS:
+: Classe 0 é iris-setosa
+: Classe 1 é iris-versicolor
+: Classe 2 é iris-virginica
+: Precisão pra classe 0 é 1.0
+: Precisão pra classe 1 é 1.0
+: Precisão pra classe 2 é 0.9310344827586207
+: Média ponderada da precisão: 0.9770114942528736
+
+** DONE (g)
+Calcule a Medida-F por classe.
+
+
+#+BEGIN_SRC python :session segundo :results output
+
+medida_f = []
+for i in range(len(matriz)):
+    num = 2 * precisao_por_classe[i] * recall_por_classe[i]
+    dem = precisao_por_classe[i] + recall_por_classe[i]
+    medida_f.append(num/dem)
+    print("Medida-f_1 da classe " + str(i) + " é: " + str(medida_f[i]))
+    
+
+
+#+END_SRC
+
+#+RESULTS:
+: Medida-f_1 da classe 0 é: 1.0
+: Medida-f_1 da classe 1 é: 0.9545454545454545
+: Medida-f_1 da classe 2 é: 0.9642857142857143
+
+** DONE (h)
+Calcule a média ponderada da Medida-F.
+
+
+#+BEGIN_SRC python :session segundo :results output
+
+
+soma_p = 0
+for i in range(len(medida_f)):
+    soma_p += pesos[i] * medida_f[i]
+
+media_ponderada_f = soma_p / sum(pesos)
+
+print("Media ponderada da medida f: " + str(media_ponderada_f))
+print(sum(pesos))
+
+
+#+END_SRC
+
+#+RESULTS:
+: Media ponderada da medida f: 0.972943722943723
+: 150
+
+** DONE (i)
+Calcule a Taxa de FP por classe.
+
+#+BEGIN_SRC python :session segundo :results output
+
+nomes = [
+"Iris-setosa",
+"Iris-versicolor",
+"Iris-virginica",
+]
+
+taxas_fp = []
+for i in range(len(classes_reais)):
+    soma = sum(matriz[i])
+    acc = 0
+    for r in resultados:
+        if r[1] == nomes[i]:
+            if r[0][4] != nomes[i]:
+                acc += 1
+
+    taxas_fp.append(acc/soma)
+               
+
+for t in range(len(taxas_fp)):
+    print("Taxa fp da classe " + nomes[t] + " é de: " + str(taxas_fp[t]))
+
+#+END_SRC
+
+#+RESULTS:
+: Taxa fp da classe Iris-setosa é de: 0.0
+: Taxa fp da classe Iris-versicolor é de: 0.0
+: Taxa fp da classe Iris-virginica é de: 0.07407407407407407
+
+** DONE (j)
+Calcule a média ponderada da Taxa de FP.
+
+#+BEGIN_SRC python :session segundo :results output
+
+
+media_ponderada_fp = 0
+
+for t in range(len(taxas_fp)):
+    media_ponderada_fp += pesos[t] * taxas_fp[t]
+
+media_ponderada_fp = media_ponderada_fp / sum(pesos)
+
+print("Media ponderada da taxa de FP: " + str(media_ponderada_fp))
+
+
+#+END_SRC
+
+#+RESULTS:
+: Media ponderada da taxa de FP: 0.024691358024691357
+
+** DONE (k)
+Plote o gráfico ROC e mostre qual ponto representa este classificador. Indique se este
+ponto está acima ou abaixo da diagonal f(x) = x e o que isto significa.
+
+
+#+BEGIN_SRC python :session segundo :results output
+
+import matplotlib.pyplot as plt
+plt.title('Receiver Operating Characteristic')
+plt.xlim([0, 1])
+plt.ylim([0, 1])
+
+plt.scatter(media_ponderada_fp, media_ponderada_recall)
+lx = [0,1]
+ly = [0,1]
+plt.plot(lx, ly, '--')
+
+plt.ylabel('Taxa de VP - Recall')
+plt.xlabel('Taxa FP')
+fname = 'rocc.png'
+plt.savefig(fname)
+#+END_SRC
+
+#+RESULTS:
+
+
+[[file:rocc.png]]
+
+* DONE 4. (8 pontos)
+Indique qual métrica de avaliação você acha mais adequada para cada um dos
+seguintes problemas:
+
+** (a)
+Login por impressão digital (fingerprint) em um dispositivo móvel. Nesta aplicação é
+aconselhável que o usuário consiga logar sempre mesmo correndo o risco de um pequena
+probabilidade de outra pessoa consiga se passar por ele.
+
+
+*** Resposta
+Talvez uma média f balanceada com o maior recall possível, diminuindo a chance de
+uma pessoa se passar por outra.
+
+** (b)
+Classificar o e-mail como SPAM (Sending and Posting Advertisement in Mass) mas evitando
+que mensagens importantes sejam enviadas para a lixeira. Isto pode ter como
+consequência que alguns SPAMs vão chegar a caixa de entrada.
+
+*** Resposta
+Recall, podendo haver e-mails importantes, então falsos positivos são permitidos,
+e falso negativos não. vp / (vp + fn), maximizando fn tem que ser o menor possível
+
+** (c)
+Classificar uma fruta com saudável ou doente. Escolher o máximo de frutas saudáveis
+mesmo que alguma fruta doente apareça no meio daquelas selecionadas.
+
+*** Resposta
+Minimizar a quantidade de maçãs doentes, de todas as maçãs saudáveis, acertar
+todas, então recall, vp / (vp + fn). Minimiza o falso negativo (fn), ou seja, não
+diz que maçã boa é doente.
+
+** (d)
+Detecção de faces, dizer que uma imagem é uma face humana somente quando tiver muita
+certeza de que é uma face. Deve-se evitar dizer que uma imagem é uma face quando não
+é de fato.
+
+
+*** Resposta
+Maximizar taxa de acerto para classe positiva. Dos classificados como positivo, quantos
+são de fato positivo, então precisão. vp / (vp + fp).
+* DONE ? 5. (8 pontos)
+Na questão anterior, quando sua resposta foi Precisão indique o que significaria
+maximizar o Recall, quando sua resposta foi Recall indique o significaria maximizar a Precisão.
+* DONE 6. (12 pontos)
+
+
+[[file:roc.jpg]]
+
+A Figura 1 mostra três curvas ROC. Quais justificativas você teria para:
+
+
+** (a) Escolher o classificador B em detrimento do classificador A.
+Melhor dentre os 3 considerando apenas suas taxas, tendo uma 
+maior área sob a curva, e obtendo um resultado razoável quando
+poucos falso positivos
+** (b) Escolher o classificador C em detrimento do classificador A.
+Talvez um classificador rápido, em uma situação com poucos falso
+positivos se sai melhor que o classificador A.
+** (c) Escolher o classificador B em detrimento do classificador C.
+Melhor dentre os 3, pelos mesmos motivos, e quando a taxa de FP é
+maior que 10%, ele se bem sai melhor.
+** (d) Escolher o classificador C em detrimento do classificador B.
+Mesmos motivos que em detrimento de A
+** (e) Escolher o classificador A em detrimento do classificador C.
+Maior área, e maior confiabilidade em cenários de maiores falsos
+positivos
+** (f) Escolher o classificador A em detrimento do classificador B.
+Em situações com falsos positivos maior que 20%, o classificador A
+é mais confiável
+* DONE 7. (15 pontos) [5/5]
+Utilizando o classificador 1-NN com distância Euclidiana na base Wine archive.
+ics.uci.edu/ml/datasets/Wine realize os seguintes experimentos:
+
+
+#+BEGIN_SRC bash
+wget -nc http://archive.ics.uci.edu/ml/machine-learning-databases/wine/wine.data
+file wine.data
+#+END_SRC
+
+#+RESULTS:
+: wine.data: CSV text
+
+
+
+** DONE (a)
+Holdout completamente aleatório com 90% dos dados para treino e o restante para teste
+e calcule a taxa de acerto.
+
+#+BEGIN_SRC python :results output
+  arq_lista = open("wine.data", "r")
+  linhas = list(map(lambda linha : linha.replace("\n", ""), arq_lista.readlines()))
+  linhas = list(map(lambda linha: linha.split(','), linhas))
+
+  # aleatoriza a ordem dos dados
+  import random
+  random.shuffle(linhas)
+  random.shuffle(linhas)
+  random.shuffle(linhas)
+
+  idx = int(0.9 * len(linhas))
+  treino = linhas[:idx]
+  testes = linhas[idx:]
+
+  # remove classificação
+  treino_x = list(map(lambda e : e[1:], treino))
+  # transforma em floats
+  treino_x = list(map(lambda e : list(map(lambda o : float(o), e)), treino_x))
+  # só as classificação
+  treino_y = list(map(lambda e : float(e[0]), treino))
+
+  # remove classificação
+  teste_x = list(map(lambda e : e[1:], testes))
+  # transforma em floats
+  teste_x = list(map(lambda e : list(map(lambda o : float(o), e)), teste_x))
+  # só as classificação
+  teste_y = list(map(lambda e : float(e[0]), testes))
+
+
+  from sklearn.neighbors import KNeighborsClassifier
+ 
+
+  k = 1
+  knn = KNeighborsClassifier(n_neighbors=k, algorithm="brute", metric="minkowski", p=2)
+  knn.fit(treino_x, treino_y)
+  print(knn.score(teste_x, teste_y))
+
+
+#+END_SRC
+
+#+RESULTS:
+: 0.8333333333333334
+
+** DONE (b)
+10 repetições de Holdout completamente aleatório com 90% dos dados para treino e o
+restante para teste. Mostre os 10 resultados de taxa de acerto e sua média.
+
+
+
+#+BEGIN_SRC python :results output
+  arq_lista = open("wine.data", "r")
+  linhas = list(map(lambda linha : linha.replace("\n", ""), arq_lista.readlines()))
+  linhas = list(map(lambda linha: linha.split(','), linhas))
+
+  import random
+  from sklearn.neighbors import KNeighborsClassifier
+
+  scores = []
+  for i in range(10):
+      # aleatoriza a ordem dos dados
+      random.shuffle(linhas)
+      random.shuffle(linhas)
+      random.shuffle(linhas)
+
+      idx = int(0.9 * len(linhas))
+      treino = linhas[:idx]
+      testes = linhas[idx:]
+
+      # remove classificação
+      treino_x = list(map(lambda e : e[1:], treino))
+      # transforma em floats
+      treino_x = list(map(lambda e : list(map(lambda o : float(o), e)), treino_x))
+      # só as classificação
+      treino_y = list(map(lambda e : float(e[0]), treino))
+
+      # remove classificação
+      teste_x = list(map(lambda e : e[1:], testes))
+      # transforma em floats
+      teste_x = list(map(lambda e : list(map(lambda o : float(o), e)), teste_x))
+      # só as classificação
+      teste_y = list(map(lambda e : float(e[0]), testes))
+
+      k = 1
+      knn = KNeighborsClassifier(n_neighbors=k, algorithm="brute", metric="minkowski", p=2)
+      knn.fit(treino_x, treino_y)
+      scores.append(knn.score(teste_x, teste_y))
+  
+  for (i, s) in enumerate(scores):
+      print("Holdout n ", i+1, " com taxa de acerto de ", s)
+
+  print("Media das taxas de acerto de ", (sum(scores) / len(scores)))
+
+
+
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+Holdout n  1  com taxa de acerto de  1.0
+Holdout n  2  com taxa de acerto de  0.8888888888888888
+Holdout n  3  com taxa de acerto de  0.8333333333333334
+Holdout n  4  com taxa de acerto de  0.7222222222222222
+Holdout n  5  com taxa de acerto de  0.8888888888888888
+Holdout n  6  com taxa de acerto de  0.7222222222222222
+Holdout n  7  com taxa de acerto de  0.8333333333333334
+Holdout n  8  com taxa de acerto de  0.6666666666666666
+Holdout n  9  com taxa de acerto de  0.8888888888888888
+Holdout n  10  com taxa de acerto de  0.6666666666666666
+Media das taxas de acerto de  0.8111111111111111
+#+end_example
+
+** DONE (c)
+10 repetições de Holdout Estratificado com 90% dos dados para treino e o restante para
+teste. Mostre os 10 resultados e a média da taxa de acerto.
+
+
+#+BEGIN_SRC python :results output
+  arq_lista = open("wine.data", "r")
+  linhas = list(map(lambda linha : linha.replace("\n", ""), arq_lista.readlines()))
+  linhas = list(map(lambda linha: linha.split(','), linhas))
+
+  import random
+  from sklearn.neighbors import KNeighborsClassifier
+  from sklearn.model_selection import train_test_split
+
+  scores = []
+  for i in range(10):
+      # aleatoriza a ordem dos dados
+      random.shuffle(linhas)
+      random.shuffle(linhas)
+      random.shuffle(linhas)
+
+      # remove classificação
+      xs = list(map(lambda e : e[1:], linhas))
+      # transforma em floats
+      xs = list(map(lambda e : list(map(lambda o : float(o), e)), xs))
+      # só as classificação
+      ys = list(map(lambda e : float(e[0]), linhas))
+
+
+      x_train, x_test, y_train, y_test = train_test_split(xs, ys,
+                                                    test_size=0.1,
+                                                    random_state=0,
+                                                    stratify=ys)
+
+
+      k = 1
+      knn = KNeighborsClassifier(n_neighbors=k, algorithm="brute", metric="minkowski", p=2)
+      knn.fit(x_train, y_train)
+      scores.append(knn.score(x_test, y_test))
+  
+  for (i, s) in enumerate(scores):
+      print("Holdout n ", i+1, " com taxa de acerto de ", s)
+
+  print("Media das taxas de acerto de ", (sum(scores) / len(scores)))
+
+
+
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+Holdout n  1  com taxa de acerto de  0.6666666666666666
+Holdout n  2  com taxa de acerto de  0.8333333333333334
+Holdout n  3  com taxa de acerto de  0.7222222222222222
+Holdout n  4  com taxa de acerto de  0.8333333333333334
+Holdout n  5  com taxa de acerto de  0.7777777777777778
+Holdout n  6  com taxa de acerto de  0.7222222222222222
+Holdout n  7  com taxa de acerto de  0.8888888888888888
+Holdout n  8  com taxa de acerto de  0.8333333333333334
+Holdout n  9  com taxa de acerto de  0.7777777777777778
+Holdout n  10  com taxa de acerto de  0.9444444444444444
+Media das taxas de acerto de  0.8
+#+end_example
+
+** DONE (d)
+10-fold cross validation Estratificado. Mostre os 10 resultados da taxa de acerto, sua
+média e, também, a taxa de acerto somando os resultados de todas as folds.
+
+
+#+BEGIN_SRC python :results output
+  arq_lista = open("wine.data", "r")
+  linhas = list(map(lambda linha : linha.replace("\n", ""), arq_lista.readlines()))
+  linhas = list(map(lambda linha: linha.split(','), linhas))
+
+  import random
+  from sklearn.neighbors import KNeighborsClassifier
+  from sklearn.model_selection import StratifiedKFold 
+
+
+  scores = []
+  # aleatoriza a ordem dos dados
+  random.shuffle(linhas)
+  random.shuffle(linhas)
+  random.shuffle(linhas)
+
+  # remove classificação
+  xs = list(map(lambda e : e[1:], linhas))
+  # transforma em floats
+  xs = list(map(lambda e : list(map(lambda o : float(o), e)), xs))
+  # só as classificação
+  ys = list(map(lambda e : float(e[0]), linhas))
+
+
+
+  skf = StratifiedKFold(n_splits=10, shuffle=True)
+
+  for (train_indices, test_indices) in (skf.split(xs, ys)):
+      x_treino = []
+      y_treino = []
+      x_teste = []
+      y_teste = []
+     
+      for i in train_indices:
+          x_treino.append(xs[i])
+          y_treino.append(ys[i])
+
+      for i in test_indices:
+          x_teste.append(xs[i])
+          y_teste.append(ys[i])
+
+      k = 1
+      knn = KNeighborsClassifier(n_neighbors=k, algorithm="brute", metric="minkowski", p=2)
+      knn.fit(x_treino, y_treino)
+      scores.append(knn.score(x_teste, y_teste))
+
+  for (i, s) in enumerate(scores):
+      print("Holdout n ", i+1, " com taxa de acerto de ", s)
+
+  print("Media das taxas de acerto de ", (sum(scores) / len(scores)))
+
+
+
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+Holdout n  1  com taxa de acerto de  0.7777777777777778
+Holdout n  2  com taxa de acerto de  0.8333333333333334
+Holdout n  3  com taxa de acerto de  0.8333333333333334
+Holdout n  4  com taxa de acerto de  0.5555555555555556
+Holdout n  5  com taxa de acerto de  0.6111111111111112
+Holdout n  6  com taxa de acerto de  0.8888888888888888
+Holdout n  7  com taxa de acerto de  0.7222222222222222
+Holdout n  8  com taxa de acerto de  0.7777777777777778
+Holdout n  9  com taxa de acerto de  0.7058823529411765
+Holdout n  10  com taxa de acerto de  0.8235294117647058
+Media das taxas de acerto de  0.7529411764705882
+#+end_example
+
+** DONE (e)
+Leave-one-out e calcule a taxa de acerto.
+
+
+#+BEGIN_SRC python :results output
+  arq_lista = open("wine.data", "r")
+  linhas = list(map(lambda linha : linha.replace("\n", ""), arq_lista.readlines()))
+  linhas = list(map(lambda linha: linha.split(','), linhas))
+
+  # aleatorizar n faz diferença
+
+  from sklearn.neighbors import KNeighborsClassifier
+
+  scores = []
+  for i in range(len(linhas)):
+
+      # remove classificação
+      xs = list(map(lambda e : e[1:], linhas))
+      # transforma em floats
+      xs = list(map(lambda e : list(map(lambda o : float(o), e)), xs))
+      # só as classificação
+      ys = list(map(lambda e : float(e[0]), linhas))
+      
+      x_train = []
+      y_train = []
+      x_test = []
+      y_test = []
+      for j in range(len(linhas)):
+          if j == i:
+              x_test.append(xs[j])
+              y_test.append(ys[j])
+          else:
+              x_train.append(xs[j])
+              y_train.append(ys[j])
+
+
+      k = 1
+      knn = KNeighborsClassifier(n_neighbors=k, algorithm="brute", metric="minkowski", p=2)
+      knn.fit(x_train, y_train)
+      scores.append(knn.score(x_test, y_test))
+  
+
+  print("taxa de acerto de ", (sum(scores) / len(scores)))
+
+
+
+#+END_SRC
+
+#+RESULTS:
+: taxa de acerto de  0.7696629213483146
+
+* DONE 8. (15 pontos) [5/5]
+Refaça o experimento da questão anterior removendo a última coluna da base.
+
+** DONE (a)
+Holdout completamente aleatório com 90% dos dados para treino e o restante para teste
+e calcule a taxa de acerto.
+
+#+BEGIN_SRC python :results output
+  arq_lista = open("wine.data", "r")
+  linhas = list(map(lambda linha : linha.replace("\n", ""), arq_lista.readlines()))
+  linhas = list(map(lambda linha: linha.split(','), linhas))
+
+  # aleatoriza a ordem dos dados
+  import random
+  random.shuffle(linhas)
+  random.shuffle(linhas)
+  random.shuffle(linhas)
+
+  idx = int(0.9 * len(linhas))
+  treino = linhas[:idx]
+  testes = linhas[idx:]
+
+  # remove classificação
+  treino_x = list(map(lambda e : e[1:], treino))
+  # remove a ultima coluna
+  treino_x = list(map(lambda e : e[:-1], treino_x))
+  # transforma em floats
+  treino_x = list(map(lambda e : list(map(lambda o : float(o), e)), treino_x))
+  # só as classificação
+  treino_y = list(map(lambda e : float(e[0]), treino))
+
+  # remove classificação
+  teste_x = list(map(lambda e : e[1:], testes))
+  # remove a ultima coluna
+  teste_x = list(map(lambda e : e[:-1], teste_x))
+  # transforma em floats
+  teste_x = list(map(lambda e : list(map(lambda o : float(o), e)), teste_x))
+  # só as classificação
+  teste_y = list(map(lambda e : float(e[0]), testes))
+
+
+  from sklearn.neighbors import KNeighborsClassifier
+ 
+
+  k = 1
+  knn = KNeighborsClassifier(n_neighbors=k, algorithm="brute", metric="minkowski", p=2)
+  knn.fit(treino_x, treino_y)
+  print(knn.score(teste_x, teste_y))
+
+
+#+END_SRC
+
+#+RESULTS:
+: 0.9444444444444444
+
+** DONE (b)
+10 repetições de Holdout completamente aleatório com 90% dos dados para treino e o
+restante para teste. Mostre os 10 resultados de taxa de acerto e sua média.
+
+
+
+#+BEGIN_SRC python :results output
+  arq_lista = open("wine.data", "r")
+  linhas = list(map(lambda linha : linha.replace("\n", ""), arq_lista.readlines()))
+  linhas = list(map(lambda linha: linha.split(','), linhas))
+
+  import random
+  from sklearn.neighbors import KNeighborsClassifier
+
+  scores = []
+  for i in range(10):
+      # aleatoriza a ordem dos dados
+      random.shuffle(linhas)
+      random.shuffle(linhas)
+      random.shuffle(linhas)
+
+      idx = int(0.9 * len(linhas))
+      treino = linhas[:idx]
+      testes = linhas[idx:]
+
+      # remove classificação
+      treino_x = list(map(lambda e : e[1:], treino))
+      # remove a ultima coluna
+      treino_x = list(map(lambda e : e[:-1], treino_x))
+ 
+      # transforma em floats
+      treino_x = list(map(lambda e : list(map(lambda o : float(o), e)), treino_x))
+      # só as classificação
+      treino_y = list(map(lambda e : float(e[0]), treino))
+
+      # remove classificação
+      teste_x = list(map(lambda e : e[1:], testes))
+
+      # remove a ultima coluna
+      teste_x = list(map(lambda e : e[:-1], teste_x))
+ 
+      # transforma em floats
+      teste_x = list(map(lambda e : list(map(lambda o : float(o), e)), teste_x))
+      # só as classificação
+      teste_y = list(map(lambda e : float(e[0]), testes))
+
+      k = 1
+      knn = KNeighborsClassifier(n_neighbors=k, algorithm="brute", metric="minkowski", p=2)
+      knn.fit(treino_x, treino_y)
+      scores.append(knn.score(teste_x, teste_y))
+  
+  for (i, s) in enumerate(scores):
+      print("Holdout n ", i+1, " com taxa de acerto de ", s)
+
+  print("Media das taxas de acerto de ", (sum(scores) / len(scores)))
+
+
+
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+Holdout n  1  com taxa de acerto de  0.7777777777777778
+Holdout n  2  com taxa de acerto de  1.0
+Holdout n  3  com taxa de acerto de  0.7777777777777778
+Holdout n  4  com taxa de acerto de  0.8888888888888888
+Holdout n  5  com taxa de acerto de  0.8333333333333334
+Holdout n  6  com taxa de acerto de  0.7777777777777778
+Holdout n  7  com taxa de acerto de  0.8888888888888888
+Holdout n  8  com taxa de acerto de  0.7777777777777778
+Holdout n  9  com taxa de acerto de  1.0
+Holdout n  10  com taxa de acerto de  0.8888888888888888
+Media das taxas de acerto de  0.861111111111111
+#+end_example
+
+** DONE (c)
+10 repetições de Holdout Estratificado com 90% dos dados para treino e o restante para
+teste. Mostre os 10 resultados e a média da taxa de acerto.
+
+
+#+BEGIN_SRC python :results output
+  arq_lista = open("wine.data", "r")
+  linhas = list(map(lambda linha : linha.replace("\n", ""), arq_lista.readlines()))
+  linhas = list(map(lambda linha: linha.split(','), linhas))
+
+  import random
+  from sklearn.neighbors import KNeighborsClassifier
+  from sklearn.model_selection import train_test_split
+
+  scores = []
+  for i in range(10):
+      # aleatoriza a ordem dos dados
+      random.shuffle(linhas)
+      random.shuffle(linhas)
+      random.shuffle(linhas)
+
+      # remove classificação
+      xs = list(map(lambda e : e[1:], linhas))
+      # remove a ultima coluna
+      xs = list(map(lambda e : e[:-1], linhas))
+      # transforma em floats
+      xs = list(map(lambda e : list(map(lambda o : float(o), e)), xs))
+      # só as classificação
+      ys = list(map(lambda e : float(e[0]), linhas))
+
+
+      x_train, x_test, y_train, y_test = train_test_split(xs, ys,
+                                                    test_size=0.1,
+                                                    random_state=0,
+                                                    stratify=ys)
+
+
+      k = 1
+      knn = KNeighborsClassifier(n_neighbors=k, algorithm="brute", metric="minkowski", p=2)
+      knn.fit(x_train, y_train)
+      scores.append(knn.score(x_test, y_test))
+  
+  for (i, s) in enumerate(scores):
+      print("Holdout n ", i+1, " com taxa de acerto de ", s)
+
+  print("Media das taxas de acerto de ", (sum(scores) / len(scores)))
+
+
+
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+Holdout n  1  com taxa de acerto de  0.9444444444444444
+Holdout n  2  com taxa de acerto de  0.9444444444444444
+Holdout n  3  com taxa de acerto de  0.8888888888888888
+Holdout n  4  com taxa de acerto de  0.7222222222222222
+Holdout n  5  com taxa de acerto de  0.9444444444444444
+Holdout n  6  com taxa de acerto de  0.8333333333333334
+Holdout n  7  com taxa de acerto de  1.0
+Holdout n  8  com taxa de acerto de  0.8333333333333334
+Holdout n  9  com taxa de acerto de  0.9444444444444444
+Holdout n  10  com taxa de acerto de  0.8888888888888888
+Media das taxas de acerto de  0.8944444444444445
+#+end_example
+
+** DONE (d)
+10-fold cross validation Estratificado. Mostre os 10 resultados da taxa de acerto, sua
+média e, também, a taxa de acerto somando os resultados de todas as folds.
+
+
+#+BEGIN_SRC python :results output
+  arq_lista = open("wine.data", "r")
+  linhas = list(map(lambda linha : linha.replace("\n", ""), arq_lista.readlines()))
+  linhas = list(map(lambda linha: linha.split(','), linhas))
+
+  import random
+  from sklearn.neighbors import KNeighborsClassifier
+  from sklearn.model_selection import StratifiedKFold 
+
+
+  scores = []
+  # aleatoriza a ordem dos dados
+  random.shuffle(linhas)
+  random.shuffle(linhas)
+  random.shuffle(linhas)
+
+  # remove classificação
+  xs = list(map(lambda e : e[1:], linhas))
+  # remove a ultima coluna
+  xs = list(map(lambda e : e[:-1], linhas))
+  # transforma em floats
+  xs = list(map(lambda e : list(map(lambda o : float(o), e)), xs))
+  # só as classificação
+  ys = list(map(lambda e : float(e[0]), linhas))
+
+
+
+  skf = StratifiedKFold(n_splits=10, shuffle=True)
+
+  for (train_indices, test_indices) in (skf.split(xs, ys)):
+      x_treino = []
+      y_treino = []
+      x_teste = []
+      y_teste = []
+     
+      for i in train_indices:
+          x_treino.append(xs[i])
+          y_treino.append(ys[i])
+
+      for i in test_indices:
+          x_teste.append(xs[i])
+          y_teste.append(ys[i])
+
+      k = 1
+      knn = KNeighborsClassifier(n_neighbors=k, algorithm="brute", metric="minkowski", p=2)
+      knn.fit(x_treino, y_treino)
+      scores.append(knn.score(x_teste, y_teste))
+
+  for (i, s) in enumerate(scores):
+      print("Holdout n ", i+1, " com taxa de acerto de ", s)
+
+  print("Media das taxas de acerto de ", (sum(scores) / len(scores)))
+
+
+
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+Holdout n  1  com taxa de acerto de  0.8888888888888888
+Holdout n  2  com taxa de acerto de  0.8333333333333334
+Holdout n  3  com taxa de acerto de  0.7777777777777778
+Holdout n  4  com taxa de acerto de  0.9444444444444444
+Holdout n  5  com taxa de acerto de  0.7222222222222222
+Holdout n  6  com taxa de acerto de  0.9444444444444444
+Holdout n  7  com taxa de acerto de  0.9444444444444444
+Holdout n  8  com taxa de acerto de  0.9444444444444444
+Holdout n  9  com taxa de acerto de  1.0
+Holdout n  10  com taxa de acerto de  0.9411764705882353
+Media das taxas de acerto de  0.8941176470588236
+#+end_example
+
+** DONE (e)
+Leave-one-out e calcule a taxa de acerto.
+
+
+#+BEGIN_SRC python :results output
+  arq_lista = open("wine.data", "r")
+  linhas = list(map(lambda linha : linha.replace("\n", ""), arq_lista.readlines()))
+  linhas = list(map(lambda linha: linha.split(','), linhas))
+
+  # aleatorizar n faz diferença
+
+  from sklearn.neighbors import KNeighborsClassifier
+
+  scores = []
+  for i in range(len(linhas)):
+
+      # remove classificação
+      xs = list(map(lambda e : e[1:], linhas))
+      # remove a ultima coluna
+      xs = list(map(lambda e : e[:-1], linhas))
+      # transforma em floats
+      xs = list(map(lambda e : list(map(lambda o : float(o), e)), xs))
+      # só as classificação
+      ys = list(map(lambda e : float(e[0]), linhas))
+
+
+     
+      x_train = []
+      y_train = []
+      x_test = []
+      y_test = []
+      for j in range(len(linhas)):
+          if j == i:
+              x_test.append(xs[j])
+              y_test.append(ys[j])
+          else:
+              x_train.append(xs[j])
+              y_train.append(ys[j])
+
+
+      k = 1
+      knn = KNeighborsClassifier(n_neighbors=k, algorithm="brute", metric="minkowski", p=2)
+      knn.fit(x_train, y_train)
+      scores.append(knn.score(x_test, y_test))
+  
+
+  print("taxa de acerto de ", (sum(scores) / len(scores)))
+
+
+
+#+END_SRC
+
+#+RESULTS:
+: taxa de acerto de  0.8932584269662921
+
+

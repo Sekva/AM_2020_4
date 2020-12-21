@@ -1,4 +1,4 @@
-#+TITLE: Semana 1
+#+TITLE: Semana 2
 #+STARTUP: overview
 
 * 1. (15 pontos)
@@ -20,11 +20,7 @@ como conjunto de treinamento.
 
 #+BEGIN_SRC python
   def dist(a, b):
-      arr = []
-      for i in range(4):
-          arr.append(float(a[i]) - float(b[i]))
-          arr = list(map(lambda x : x * x, arr))
-      return sum(arr) ** (1/2)
+      return ((float(a[0]) - float(b[0]))**2 + (float(a[1]) - float(b[1]))**2 + (float(a[1]) - float(b[1]))**2 + (float(a[2]) - float(b[2]))**2 + (float(a[3]) - float(b[3]))**2) ** (1/2)
 
   arq_lista = open("iris.data", "r")
   linhas = list(map(lambda linha : linha.replace("\n", ""), arq_lista.readlines()))
@@ -34,13 +30,12 @@ como conjunto de treinamento.
   classe_2 = linhas[60]
   classe_3 = linhas[120]
 
-  exemplo_1 = linhas[5]
-  exemplo_2 = linhas[6]
-  exemplo_3 = linhas[61]
-  exemplo_4 = linhas[62]
-  exemplo_5 = linhas[121]
-  exemplo_6 = linhas[122]
-
+  exemplo_1 = linhas[39]
+  exemplo_2 = linhas[13]
+  exemplo_3 = linhas[71]
+  exemplo_4 = linhas[82]
+  exemplo_5 = linhas[101]
+  exemplo_6 = linhas[148]
 
   return [
   (classe_1),
@@ -60,65 +55,48 @@ como conjunto de treinamento.
   ]
 
 
-#+END_SRC
+#+end_src
 
-#+RESULTS:
-|                 5.0 |                3.6 |                1.4 |                0.2 | Iris-setosa        |                    |
-|                 5.0 |                2.0 |                3.5 |                1.0 | Iris-versicolor    |                    |
-|                 6.9 |                3.2 |                5.7 |                2.3 | Iris-virginica     |                    |
-|                 --- |                --- |                --- |                --- | ---                |                --- |
-|                 5.4 |                3.9 |                1.7 |                0.4 | Iris-setosa        |                    |
-|                 4.6 |                3.4 |                1.4 |                0.3 | Iris-setosa        |                    |
-|                 5.9 |                3.0 |                4.2 |                1.5 | Iris-versicolor    |                    |
-|                 6.0 |                2.2 |                4.0 |                1.0 | Iris-versicolor    |                    |
-|                 5.6 |                2.8 |                4.9 |                2.0 | Iris-virginica     |                    |
-|                 7.7 |                2.8 |                6.7 |                2.0 | Iris-virginica     |                    |
-|                 --- |                --- |                --- |                --- | ---                |                --- |
-| 0.21946762744589374 | 0.1000149463666786 | 7.9597549069607165 | 7.8800691976657165 | 12.388323303457609 | 2824.4356539952223 |
-|   13.44221822615214 |  5.890330295450054 | 1.2943732146816023 | 1.0307776481860673 | 2.238225697062463  | 2824.3141349820526 |
-|   30.27389112058919 |  783.3306592178446 | 2.5889191876147852 | 3.3507315647310794 | 8.187912815749726  | 1.0577347766198602 |
+#+results:
+|                5.0 |                3.6 |                1.4 |                0.2 | Iris-setosa        |                   |
+|                5.0 |                2.0 |                3.5 |                1.0 | Iris-versicolor    |                   |
+|                6.9 |                3.2 |                5.7 |                2.3 | Iris-virginica     |                   |
+|                --- |                --- |                --- |                --- | ---                |               --- |
+|                5.1 |                3.4 |                1.5 |                0.2 | Iris-setosa        |                   |
+|                4.3 |                3.0 |                1.1 |                0.1 | Iris-setosa        |                   |
+|                6.1 |                2.8 |                4.0 |                1.3 | Iris-versicolor    |                   |
+|                5.8 |                2.7 |                3.9 |                1.2 | Iris-versicolor    |                   |
+|                5.8 |                2.7 |                5.1 |                1.9 | Iris-virginica     |                   |
+|                6.2 |                3.4 |                5.4 |                2.3 | Iris-virginica     |                   |
+|                --- |                --- |                --- |                --- | ---                |               --- |
+| 0.3162277660168381 |   1.14455231422596 |  3.234192325759246 |  3.083828789021855 | 4.34050688284214   | 4.682947789587238 |
+| 2.9274562336608896 | 3.0099833886584824 | 1.6822603841260717 | 1.3490737563232043 | 2.2338307903688674 | 3.264965543462902 |
+|  5.036864103785212 |  5.730619512757761 |  2.202271554554524 | 2.4819347291981715 | 1.4933184523068084 | 0.812403840463596 |
 
 ** (b)
-Utilizando a matriz de distância explique a classificação dos exemplo de teste utilizando
-1-NN, 3-NN com peso e 3-NN sem peso.
+utilizando a matriz de distância explique a classificação dos exemplo de teste utilizando
+1-nn, 3-nn com peso e 3-nn sem peso.
 
 
-*** Resposta
+*** resposta
 
+**** 1-nn
++ teste 1: acertou
++ teste 2: acertou
++ teste 3: acertou
 
-|                 5.0 |                3.6 |                1.4 |                0.2 | Iris-setosa        |                    |
-|                 5.0 |                2.0 |                3.5 |                1.0 | Iris-versicolor    |                    |
-|                 6.9 |                3.2 |                5.7 |                2.3 | Iris-virginica     |                    |
-|                 --- |                --- |                --- |                --- | ---                |                --- |
-|                 5.4 |                3.9 |                1.7 |                0.4 | Iris-setosa        |                    |
-|                 4.6 |                3.4 |                1.4 |                0.3 | Iris-setosa        |                    |
-|                 5.9 |                3.0 |                4.2 |                1.5 | Iris-versicolor    |                    |
-|                 6.0 |                2.2 |                4.0 |                1.0 | Iris-versicolor    |                    |
-|                 5.6 |                2.8 |                4.9 |                2.0 | Iris-virginica     |                    |
-|                 7.7 |                2.8 |                6.7 |                2.0 | Iris-virginica     |                    |
-|                 --- |                --- |                --- |                --- | ---                |                --- |
-| 0.21946762744589374 | 0.1000149463666786 | 7.9597549069607165 | 7.8800691976657165 | 12.388323303457609 | 2824.4356539952223 |
-|   13.44221822615214 |  5.890330295450054 | 1.2943732146816023 | 1.0307776481860673 | 2.238225697062463  | 2824.3141349820526 |
-|   30.27389112058919 |  783.3306592178446 | 2.5889191876147852 | 3.3507315647310794 | 8.187912815749726  | 1.0577347766198602 |
-
-
-**** 1-NN
-+ teste 1: menor distancia foi 0.100 pra iris-setosa, acertou
-+ teste 2: menor distancia foi 1.030 pra iris-versicolor, acertou
-+ teste 3: menor distancia foi 1.057 pra iris-virginica, acertou
-
-**** 3-NN sem peso
+**** 3-nn sem peso
 + teste 1: 2 votos pra iris-setosa (0.2, 0.1) e 1 pra iris-versicolor (7.8), então classificado como iris-setosa, acertou
 + teste 2: 2 votos pra iris-versicolor (1.2, 1.0) e 1 pra iris-virginica (2.2), então classificado como iris-versicolor, acertou
-+ teste 3: 1 votos pra iris-virginica (1.0) e 2 pra iris-versicolor (2.5, 3.3), então classificado como iris-versicolor, ERROU
++ teste 3: 1 votos pra iris-virginica (1.0) e 2 pra iris-versicolor (2.5, 3.3), então classificado como iris-versicolor, errou
 
-**** 3-NN com peso
+**** 3-nn com peso
 + teste 1: peso 5 iris-s, peso 10 pra iris-s, peso 0.1 pra iris-vs, então iris-s, acertou
 + teste 2: peso 0.83 iris-vs, peso 1 pra iris-vs, peso 0.45 pra iris-vg, então iris-vs, acertou
 + teste 3: peso 1 iris-vg, peso 0.4 pra iris-vs, peso 0.30 pra iris-vs, então iris-vg, acertou
 
 ** (c)
-Selecione duas características da base Iris plote um diagrama de dispersão colocando
+selecione duas características da base iris plote um diagrama de dispersão colocando
 símbolos ou cores distintas para cada classe.
 
 #+begin_src python :results file
@@ -126,9 +104,9 @@ símbolos ou cores distintas para cada classe.
   linhas = list(map(lambda linha : linha.replace("\n", ""), arq_lista.readlines()))
   linhas = list(map(lambda linha: linha.split(','), linhas))
 
-  iris_s = list(filter(lambda l : len (l) >= 5 and l[4] == "Iris-setosa", linhas))
-  iris_vs = list(filter(lambda l : len (l) >= 5 and l[4] == "Iris-versicolor", linhas))
-  iris_vg = list(filter(lambda l : len (l) >= 5 and l[4] == "Iris-virginica", linhas))
+  iris_s = list(filter(lambda l : len (l) >= 5 and l[4] == "iris-setosa", linhas))
+  iris_vs = list(filter(lambda l : len (l) >= 5 and l[4] == "iris-versicolor", linhas))
+  iris_vg = list(filter(lambda l : len (l) >= 5 and l[4] == "iris-virginica", linhas))
 
   import matplotlib
   import matplotlib.pyplot as plt
@@ -148,7 +126,7 @@ símbolos ou cores distintas para cada classe.
   return fname # return this to org-mode
 #+end_src
 
-#+RESULTS:
+#+results:
 [[file:myfig.png]]
 * 2. (15 pontos)
 Implemente o classificador pelo vizinho mais próximo utilizando distância euclidiana. Avalie este
@@ -206,8 +184,8 @@ restante como conjunto de treinamento.
 #+END_SRC
 
 #+RESULTS:
-: Numer de acertos: 29 de 30 testes
-: Taxa de acerto: 96.66666666666667%
+: Numer de acertos: 28 de 30 testes
+: Taxa de acerto: 93.33333333333333%
 * 3. (10 pontos)
 Refaça a questão anterior utilizando a distância de Minkowski, descrita abaixo.
 Calcule os resultados para p = 1, p = 2 e p = 4.
@@ -297,12 +275,12 @@ Calcule os resultados para p = 1, p = 2 e p = 4.
 #+END_SRC
 
 #+RESULTS:
-: [p=1] Numero de acertos: 30 de 30 testes
-: [p=1] Taxa de acerto: 100.0%
-: [p=2] Numero de acertos: 29 de 30 testes
-: [p=2] Taxa de acerto: 96.66666666666667%
-: [p=4] Numero de acertos: 30 de 30 testes
-: [p=4] Taxa de acerto: 100.0%
+: [p=1] Numero de acertos: 27 de 30 testes
+: [p=1] Taxa de acerto: 90.0%
+: [p=2] Numero de acertos: 26 de 30 testes
+: [p=2] Taxa de acerto: 86.66666666666667%
+: [p=4] Numero de acertos: 27 de 30 testes
+: [p=4] Taxa de acerto: 90.0%
 
 * 4. (20 pontos)
 Implemente os classificadores 7-NN com e 7-NN sem peso e avalie os classificadores
@@ -332,6 +310,10 @@ metade como conjunto de treinamento.
 
   treino = linhas[:len(linhas)//2]
   testes = linhas[len(linhas)//2:]
+  #print(len(treino))
+  #print(len(testes))
+  #print(len(treino) + len(testes))
+  #print(len(linhas))
 
   acertos = 0
   for teste in testes:
@@ -378,27 +360,50 @@ metade como conjunto de treinamento.
       #print(teste)
       #print(sete_mais_proximos)
 
-
       sete_mais_proximos_com_peso = list(map(lambda e : (divv(1, e[0]), e[1]), sete_mais_proximos))
-      maior_peso = max(sete_mais_proximos_com_peso, key=lambda o : o[0])
+
+      iris_s = list(filter(lambda l : l[1][4] == "Iris-setosa", sete_mais_proximos_com_peso))
+      iris_vs = list(filter(lambda l : l[1][4] == "Iris-versicolor", sete_mais_proximos_com_peso))
+      iris_vg = list(filter(lambda l : l[1][4] == "Iris-virginica", sete_mais_proximos_com_peso))
+
+      #print(iris_s)
+      #print(iris_vs)
+      #print(iris_vg)
+
+      soma_iris_s = 0
+      soma_iris_vs = 0
+      soma_iris_vg = 0
+
+      for i in iris_s: soma_iris_s += i[0]
+      for i in iris_vs: soma_iris_vs += i[0]
+      for i in iris_vg: soma_iris_vg += i[0]
+
+      #print(soma_iris_s)
+      #print(soma_iris_vs)
+      #print(soma_iris_vg)
+
+      #maior_peso = max(sete_mais_proximos_com_peso, key=lambda o : o[0])
       #print(sete_mais_proximos_com_peso)
       #print(maior_peso[1][4])
-     
+      maior_peso = max([(soma_iris_s, "Iris-setosa"), (soma_iris_vs, "Iris-versicolor"), (soma_iris_vg, "Iris-virginica")], key=lambda o : o[0])
+      #print(maior_peso)
 
-      if maior_peso[1][4] == teste[4]: acertos += 1
+
+      #if maior_peso[1][4] == teste[4]: acertos += 1
+      if maior_peso[1] == teste[4]: acertos += 1
       #break
 
   print("[com peso] Numero de acertos: " + str(acertos) + " de " + str(len(testes)) + " testes")
   print("[com peso] Taxa de acerto: " + str(acertos / len(testes) * 100) + "%")
-
+  
 
 #+END_SRC
 
 #+RESULTS:
-: [sem peso] Numero de acertos: 72 de 75 testes
-: [sem peso] Taxa de acerto: 96.0%
-: [com peso] Numero de acertos: 71 de 75 testes
-: [com peso] Taxa de acerto: 94.66666666666667%
+: [sem peso] Numero de acertos: 73 de 75 testes
+: [sem peso] Taxa de acerto: 97.33333333333334%
+: [com peso] Numero de acertos: 72 de 75 testes
+: [com peso] Taxa de acerto: 96.0%
 
 * 5. (10 pontos)
 Utilize uma implementação pronta (biblioteca), e compare os resultados da sua implementação
@@ -406,87 +411,104 @@ na questão anterior com o resultado da biblioteca. Dica: você pode utilizar o 
 http://scikit-learn.org/stable/modules/generated/sklearn.neighbors.KNeighborsClassifier.html.
 
 #+BEGIN_SRC python :results output
-  def dist(a, b, p):
-      arr = []
-      for i in range(4):
-          arr.append(float(a[i]) - float(b[i]))
-          arr = list(map(lambda x : abs(x ** p), arr))
-      return sum(arr) ** (1/p)
+def dist(a, b, p):
+    arr = []
+    for i in range(4):
+        arr.append(float(a[i]) - float(b[i]))
+        arr = list(map(lambda x : abs(x ** p), arr))
+    return sum(arr) ** (1/p)
 
-  arq_lista = open("iris.data", "r")
-  linhas = list(map(lambda linha : linha.replace("\n", ""), arq_lista.readlines()))
-  linhas = list(map(lambda linha: linha.split(','), linhas))
-  #print(linhas[-1])
-  linhas.pop()
-  #print(linhas[-1])
+arq_lista = open("iris.data", "r")
+linhas = list(map(lambda linha : linha.replace("\n", ""), arq_lista.readlines()))
+linhas = list(map(lambda linha: linha.split(','), linhas))
+#print(linhas[-1])
+linhas.pop()
+#print(linhas[-1])
 
-  # aleatoriza a ordem dos dados
-  import random
-  random.shuffle(linhas)
-  random.shuffle(linhas)
-  random.shuffle(linhas)
+# aleatoriza a ordem dos dados
+import random
+random.shuffle(linhas)
+random.shuffle(linhas)
+random.shuffle(linhas)
 
-  treino = linhas[:len(linhas)//2]
-  testes = linhas[len(linhas)//2:]
+treino = linhas[:len(linhas)//2]
+testes = linhas[len(linhas)//2:]
 
-  acertos = 0
-  for teste in testes:
-      lista = list(map(lambda e : (dist(teste, e, 1), e), treino))
-      lista.sort(key=lambda o : o[0])
+acertos = 0
+for teste in testes:
+    lista = list(map(lambda e : (dist(teste, e, 1), e), treino))
+    lista.sort(key=lambda o : o[0])
 
-      sete_mais_proximos = lista[:7]
-      #print(sete_mais_proximos)
-      #print(teste)
+    sete_mais_proximos = lista[:7]
+    #print(sete_mais_proximos)
+    #print(teste)
 
-      iris_s = list(filter(lambda l : l[1][4] == "Iris-setosa", sete_mais_proximos))
-      iris_vs = list(filter(lambda l : l[1][4] == "Iris-versicolor", sete_mais_proximos))
-      iris_vg = list(filter(lambda l : l[1][4] == "Iris-virginica", sete_mais_proximos))
+    iris_s = list(filter(lambda l : l[1][4] == "Iris-setosa", sete_mais_proximos))
+    iris_vs = list(filter(lambda l : l[1][4] == "Iris-versicolor", sete_mais_proximos))
+    iris_vg = list(filter(lambda l : l[1][4] == "Iris-virginica", sete_mais_proximos))
 
-      eleicao = (
-      (len(iris_s), "Iris-setosa"),
-      (len(iris_vs), "Iris-versicolor"),
-      (len(iris_vg), "Iris-virginica"),
-      )
+    eleicao = (
+        (len(iris_s), "Iris-setosa"),
+        (len(iris_vs), "Iris-versicolor"),
+        (len(iris_vg), "Iris-virginica"),
+    )
 
-      vencedor = max(eleicao, key=lambda o : o[0])
-      #print(vencedor)
+    vencedor = max(eleicao, key=lambda o : o[0])
+    #print(vencedor)
 
-      if vencedor[1] == teste[4]: acertos += 1
-      #break
+    if vencedor[1] == teste[4]: acertos += 1
+    #break
 
-  print("[7-nn meu] Numero de acertos: " + str(acertos) + " de " + str(len(testes)) + " testes")
-  print("[7-nn meu] Taxa de acerto: " + str(acertos / len(testes) * 100) + "%")
-
-
-  # remove classificação
-  treino_x = list(map(lambda e : e[:-1], treino))
-  # transforma em floats
-  treino_x = list(map(lambda e : list(map(lambda o : float(o), e)), treino_x))
-  # só as classificação
-  treino_y = list(map(lambda e : e[-1], treino))
+print("[7-nn meu] Numero de acertos: " + str(acertos) + " de " + str(len(testes)) + " testes")
+print("[7-nn meu] Taxa de acerto: " + str(acertos / len(testes) * 100) + "%")
 
 
-  # remove classificação
-  teste_x = list(map(lambda e : e[:-1], testes))
-  # transforma em floats
-  teste_x = list(map(lambda e : list(map(lambda o : float(o), e)), teste_x))
-  # só as classificação
-  teste_y = list(map(lambda e : e[-1], testes))
-  
+# remove classificação
+treino_x = list(map(lambda e : e[:-1], treino))
+# transforma em floats
+treino_x = list(map(lambda e : list(map(lambda o : float(o), e)), treino_x))
+# só as classificação
+treino_y = list(map(lambda e : e[-1], treino))
 
-  from sklearn.neighbors import KNeighborsClassifier
-  knn_7 = KNeighborsClassifier(n_neighbors=7)
-  knn_7.fit(treino_x, treino_y)
-  
-  teste = zip(teste_x, teste_y)
 
-  acertos = 0
-  for t in teste:
-      if knn_7.predict([t[0]])[0] == t[1]:
-          acertos += 1
+# remove classificação
+teste_x = list(map(lambda e : e[:-1], testes))
+# transforma em floats
+teste_x = list(map(lambda e : list(map(lambda o : float(o), e)), teste_x))
+# só as classificação
+teste_y = list(map(lambda e : e[-1], testes))
 
-  print("[7-nn skl] Numero de acertos: " + str(acertos) + " de " + str(len(testes)) + " testes")
-  print("[7-nn skl] Taxa de acerto: " + str(acertos / len(testes) * 100) + "%")
+teste = zip(teste_x, teste_y)
+
+
+from sklearn.neighbors import KNeighborsClassifier
+knn_7 = KNeighborsClassifier(n_neighbors=7)
+knn_7.fit(treino_x, treino_y)
+
+acertos = 0
+for t in teste:
+    if knn_7.predict([t[0]])[0] == t[1]:
+        acertos += 1
+
+print("[7-nn skl] Numero de acertos: " + str(acertos) + " de " + str(len(testes)) + " testes")
+print("[7-nn skl] Taxa de acerto: " + str(acertos / len(testes) * 100) + "%")
+
+
+
+
+
+teste = zip(teste_x, teste_y)
+knn_7_peso = KNeighborsClassifier(n_neighbors=7, weights='distance')
+knn_7_peso.fit(treino_x, treino_y)
+
+acertos = 0
+for t in teste:
+    if knn_7_peso.predict([t[0]])[0] == t[1]:
+        acertos += 1
+
+print("[7-nn skl-peso] Numero de acertos: " + str(acertos) + " de " + str(len(testes)) + " testes")
+print("[7-nn skl-peso] Taxa de acerto: " + str(acertos / len(testes) * 100) + "%")
+
 
 #+END_SRC
 
@@ -495,6 +517,8 @@ http://scikit-learn.org/stable/modules/generated/sklearn.neighbors.KNeighborsCla
 : [7-nn meu] Taxa de acerto: 97.33333333333334%
 : [7-nn skl] Numero de acertos: 74 de 75 testes
 : [7-nn skl] Taxa de acerto: 98.66666666666667%
+: [7-nn skl-peso] Numero de acertos: 74 de 75 testes
+: [7-nn skl-peso] Taxa de acerto: 98.66666666666667%
 * 6. (10 pontos)
 Divida a base Wine http://archive.ics.uci.edu/ml/datasets/Wine utilizando 50% da classe para
 treino e o restante para teste. Avalie vários valores de k e determine qual é aquele
@@ -578,56 +602,56 @@ file wine.data
 #+END_SRC
 
 #+RESULTS:
-| 30 | 60 | 67.41573033707866 |
-| 21 | 60 | 67.41573033707866 |
-| 11 | 60 | 67.41573033707866 |
-| 32 | 59 | 66.29213483146067 |
-| 29 | 59 | 66.29213483146067 |
-| 28 | 59 | 66.29213483146067 |
-| 24 | 59 | 66.29213483146067 |
-|  6 | 59 | 66.29213483146067 |
-|  3 | 59 | 66.29213483146067 |
-| 33 | 58 |  65.1685393258427 |
-| 31 | 58 |  65.1685393258427 |
-| 27 | 58 |  65.1685393258427 |
-| 22 | 58 |  65.1685393258427 |
-|  7 | 58 |  65.1685393258427 |
-|  1 | 58 |  65.1685393258427 |
-| 38 | 57 | 64.04494382022472 |
-| 26 | 57 | 64.04494382022472 |
-| 25 | 57 | 64.04494382022472 |
-| 20 | 57 | 64.04494382022472 |
-| 19 | 57 | 64.04494382022472 |
-| 17 | 57 | 64.04494382022472 |
-| 13 | 57 | 64.04494382022472 |
-|  9 | 57 | 64.04494382022472 |
-|  5 | 57 | 64.04494382022472 |
-| 41 | 56 | 62.92134831460674 |
-| 39 | 56 | 62.92134831460674 |
-| 37 | 56 | 62.92134831460674 |
-| 36 | 56 | 62.92134831460674 |
-| 23 | 56 | 62.92134831460674 |
-| 15 | 56 | 62.92134831460674 |
-| 12 | 56 | 62.92134831460674 |
-|  8 | 56 | 62.92134831460674 |
-| 44 | 55 | 61.79775280898876 |
-| 43 | 55 | 61.79775280898876 |
-| 42 | 55 | 61.79775280898876 |
-| 40 | 55 | 61.79775280898876 |
-| 35 | 55 | 61.79775280898876 |
-| 34 | 55 | 61.79775280898876 |
-| 18 | 55 | 61.79775280898876 |
-| 16 | 55 | 61.79775280898876 |
-| 10 | 55 | 61.79775280898876 |
-| 50 | 54 | 60.67415730337079 |
-| 49 | 54 | 60.67415730337079 |
-| 48 | 54 | 60.67415730337079 |
-| 47 | 54 | 60.67415730337079 |
-| 46 | 54 | 60.67415730337079 |
-| 45 | 54 | 60.67415730337079 |
-| 14 | 54 | 60.67415730337079 |
-|  4 | 54 | 60.67415730337079 |
-|  2 | 52 | 58.42696629213483 |
+| 41 | 67 | 75.28089887640449 |
+| 39 | 67 | 75.28089887640449 |
+| 15 | 67 | 75.28089887640449 |
+| 13 | 67 | 75.28089887640449 |
+| 48 | 66 | 74.15730337078652 |
+| 46 | 66 | 74.15730337078652 |
+| 44 | 66 | 74.15730337078652 |
+| 43 | 66 | 74.15730337078652 |
+| 42 | 66 | 74.15730337078652 |
+| 40 | 66 | 74.15730337078652 |
+| 38 | 66 | 74.15730337078652 |
+| 37 | 66 | 74.15730337078652 |
+| 36 | 66 | 74.15730337078652 |
+| 35 | 66 | 74.15730337078652 |
+| 34 | 66 | 74.15730337078652 |
+| 32 | 66 | 74.15730337078652 |
+| 31 | 66 | 74.15730337078652 |
+| 30 | 66 | 74.15730337078652 |
+| 29 | 66 | 74.15730337078652 |
+| 28 | 66 | 74.15730337078652 |
+| 27 | 66 | 74.15730337078652 |
+| 26 | 66 | 74.15730337078652 |
+| 25 | 66 | 74.15730337078652 |
+| 24 | 66 | 74.15730337078652 |
+| 23 | 66 | 74.15730337078652 |
+| 22 | 66 | 74.15730337078652 |
+| 21 | 66 | 74.15730337078652 |
+| 19 | 66 | 74.15730337078652 |
+| 17 | 66 | 74.15730337078652 |
+| 16 | 66 | 74.15730337078652 |
+| 11 | 66 | 74.15730337078652 |
+|  9 | 66 | 74.15730337078652 |
+|  7 | 66 | 74.15730337078652 |
+|  6 | 66 | 74.15730337078652 |
+| 50 | 65 | 73.03370786516854 |
+| 49 | 65 | 73.03370786516854 |
+| 47 | 65 | 73.03370786516854 |
+| 45 | 65 | 73.03370786516854 |
+| 33 | 65 | 73.03370786516854 |
+| 20 | 65 | 73.03370786516854 |
+| 18 | 65 | 73.03370786516854 |
+| 14 | 65 | 73.03370786516854 |
+| 12 | 65 | 73.03370786516854 |
+| 10 | 65 | 73.03370786516854 |
+|  8 | 65 | 73.03370786516854 |
+|  1 | 64 | 71.91011235955057 |
+|  5 | 63 | 70.78651685393258 |
+|  4 | 63 | 70.78651685393258 |
+|  3 | 61 | 68.53932584269663 |
+|  2 | 60 | 67.41573033707866 |
 
 [[file:knns.png]]
 
@@ -708,56 +732,56 @@ file wine.data
 #+END_SRC
 
 #+RESULTS:
-|  1 | 78 | 87.64044943820225 |
-|  9 | 77 | 86.51685393258427 |
-|  8 | 76 | 85.39325842696628 |
-|  6 | 76 | 85.39325842696628 |
-|  5 | 76 | 85.39325842696628 |
-|  4 | 76 | 85.39325842696628 |
-|  2 | 76 | 85.39325842696628 |
-|  3 | 75 | 84.26966292134831 |
-| 11 | 74 | 83.14606741573034 |
-| 10 | 74 | 83.14606741573034 |
-|  7 | 74 | 83.14606741573034 |
-| 17 | 72 | 80.89887640449437 |
-| 15 | 72 | 80.89887640449437 |
-| 18 | 71 |  79.7752808988764 |
-| 13 | 71 |  79.7752808988764 |
-| 12 | 71 |  79.7752808988764 |
-| 21 | 70 | 78.65168539325843 |
-| 20 | 70 | 78.65168539325843 |
-| 19 | 70 | 78.65168539325843 |
-| 16 | 70 | 78.65168539325843 |
-| 14 | 70 | 78.65168539325843 |
-| 28 | 69 | 77.52808988764045 |
-| 27 | 69 | 77.52808988764045 |
-| 25 | 69 | 77.52808988764045 |
-| 26 | 68 | 76.40449438202246 |
-| 24 | 68 | 76.40449438202246 |
-| 23 | 68 | 76.40449438202246 |
-| 22 | 68 | 76.40449438202246 |
-| 36 | 66 | 74.15730337078652 |
-| 31 | 66 | 74.15730337078652 |
-| 29 | 66 | 74.15730337078652 |
-| 37 | 65 | 73.03370786516854 |
-| 34 | 65 | 73.03370786516854 |
-| 33 | 65 | 73.03370786516854 |
-| 32 | 65 | 73.03370786516854 |
-| 38 | 64 | 71.91011235955057 |
-| 30 | 64 | 71.91011235955057 |
-| 39 | 63 | 70.78651685393258 |
-| 35 | 63 | 70.78651685393258 |
-| 43 | 61 | 68.53932584269663 |
-| 40 | 61 | 68.53932584269663 |
-| 45 | 60 | 67.41573033707866 |
-| 44 | 60 | 67.41573033707866 |
-| 41 | 60 | 67.41573033707866 |
-| 48 | 59 | 66.29213483146067 |
-| 47 | 59 | 66.29213483146067 |
-| 46 | 59 | 66.29213483146067 |
-| 42 | 59 | 66.29213483146067 |
-| 50 | 58 |  65.1685393258427 |
-| 49 | 58 |  65.1685393258427 |
+|  1 | 75 | 84.26966292134831 |
+|  3 | 72 | 80.89887640449437 |
+|  2 | 72 | 80.89887640449437 |
+|  5 | 70 | 78.65168539325843 |
+|  4 | 70 | 78.65168539325843 |
+|  9 | 69 | 77.52808988764045 |
+|  8 | 69 | 77.52808988764045 |
+| 11 | 67 | 75.28089887640449 |
+|  7 | 67 | 75.28089887640449 |
+|  6 | 67 | 75.28089887640449 |
+| 10 | 66 | 74.15730337078652 |
+| 14 | 64 | 71.91011235955057 |
+| 16 | 63 | 70.78651685393258 |
+| 13 | 63 | 70.78651685393258 |
+| 12 | 63 | 70.78651685393258 |
+| 21 | 62 | 69.66292134831461 |
+| 17 | 62 | 69.66292134831461 |
+| 15 | 62 | 69.66292134831461 |
+| 19 | 61 | 68.53932584269663 |
+| 20 | 60 | 67.41573033707866 |
+| 18 | 60 | 67.41573033707866 |
+| 23 | 59 | 66.29213483146067 |
+| 24 | 58 |  65.1685393258427 |
+| 22 | 58 |  65.1685393258427 |
+| 33 | 57 | 64.04494382022472 |
+| 29 | 57 | 64.04494382022472 |
+| 26 | 57 | 64.04494382022472 |
+| 40 | 56 | 62.92134831460674 |
+| 39 | 56 | 62.92134831460674 |
+| 37 | 56 | 62.92134831460674 |
+| 34 | 56 | 62.92134831460674 |
+| 32 | 56 | 62.92134831460674 |
+| 31 | 56 | 62.92134831460674 |
+| 30 | 56 | 62.92134831460674 |
+| 28 | 56 | 62.92134831460674 |
+| 45 | 55 | 61.79775280898876 |
+| 38 | 55 | 61.79775280898876 |
+| 36 | 55 | 61.79775280898876 |
+| 35 | 55 | 61.79775280898876 |
+| 25 | 55 | 61.79775280898876 |
+| 47 | 54 | 60.67415730337079 |
+| 44 | 54 | 60.67415730337079 |
+| 42 | 54 | 60.67415730337079 |
+| 41 | 54 | 60.67415730337079 |
+| 27 | 54 | 60.67415730337079 |
+| 49 | 53 | 59.55056179775281 |
+| 48 | 53 | 59.55056179775281 |
+| 46 | 53 | 59.55056179775281 |
+| 43 | 53 | 59.55056179775281 |
+| 50 | 51 | 57.30337078651685 |
 
 [[file:knns.png]]
 
