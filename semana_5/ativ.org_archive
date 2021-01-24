@@ -1,0 +1,175 @@
+#    -*- mode: org -*-
+
+
+Archived entries from file /home/sekva/dados/BCC/8P/am/semana_5/ativ.org
+
+
+* (a)
+  :PROPERTIES:
+  :ARCHIVE_TIME: 2021-01-16 sáb 23:34
+  :ARCHIVE_FILE: ~/dados/BCC/8P/am/semana_5/ativ.org
+  :ARCHIVE_OLPATH: 1. (25 pontos)
+  :ARCHIVE_CATEGORY: ativ
+  :END:
+Mostre a média, o máximo e o mínimo das taxas de acerto.
+
+#+BEGIN_SRC python :session primeiro :results output
+  arq_lista = open("iris.data", "r")
+  linhas = list(map(lambda linha : linha.replace("\n", ""), arq_lista.readlines()))
+  linhas = list(map(lambda linha: linha.split(','), linhas))
+  #print(linhas[-1])
+  linhas.pop()
+  #print(linhas[-1])
+
+
+
+  from sklearn.neighbors import KNeighborsClassifier
+  def nn_1(base_treino, ex):
+    # remove classificação
+    treino_x = list(map(lambda e : e[:-1], base_treino))
+    # transforma em floats
+    treino_x = list(map(lambda e : list(map(lambda o : float(o), e)), treino_x))
+    # só as classificações
+    treino_y = list(map(lambda e : e[-1], base_treino))
+  
+    knn = KNeighborsClassifier(n_neighbors=1, algorithm="brute", metric="minkowski", p=2)
+    knn.fit(treino_x, treino_y)
+    
+    tx = ex[:-1]
+    ty = ex[-1]
+
+    print(tx)
+    print(ty)
+    print(knn.predict([tx])[0])
+    if ty == knn.predict([tx])[0]: return 1
+    return 0
+
+
+
+
+
+  import random
+
+
+
+  # aleatoriza a ordem dos dados
+  random.shuffle(linhas)
+  random.shuffle(linhas)
+  random.shuffle(linhas)
+
+  treino = linhas[:len(linhas)//2]
+  testes = linhas[len(linhas)//2:]
+  print(nn_1(treino, testes[0]))
+
+
+
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+['5.5', '2.5', '4.0', '1.3']
+Iris-versicolor
+/usr/lib/python3.9/site-packages/sklearn/utils/validation.py:72: FutureWarning: Beginning in version 0.22, arrays of bytes/strings will be converted to decimal numbers if dtype='numeric'. It is recommended that you convert the array to a float dtype before using it in scikit-learn, for example by using your_array = your_array.astype(np.float64).
+  return f(**kwargs)
+/usr/lib/python3.9/site-packages/sklearn/utils/validation.py:72: FutureWarning: Beginning in version 0.22, arrays of bytes/strings will be converted to decimal numbers if dtype='numeric'. It is recommended that you convert the array to a float dtype before using it in scikit-learn, for example by using your_array = your_array.astype(np.float64).
+  return f(**kwargs)
+Iris-versicolor
+/usr/lib/python3.9/site-packages/sklearn/utils/validation.py:72: FutureWarning: Beginning in version 0.22, arrays of bytes/strings will be converted to decimal numbers if dtype='numeric'. It is recommended that you convert the array to a float dtype before using it in scikit-learn, for example by using your_array = your_array.astype(np.float64).
+  return f(**kwargs)
+/usr/lib/python3.9/site-packages/sklearn/utils/validation.py:72: FutureWarning: Beginning in version 0.22, arrays of bytes/strings will be converted to decimal numbers if dtype='numeric'. It is recommended that you convert the array to a float dtype before using it in scikit-learn, for example by using your_array = your_array.astype(np.float64).
+  return f(**kwargs)
+1
+#+end_example
+
+
+* (a)
+:PROPERTIES:
+:ARCHIVE_TIME: 2021-01-17 dom 15:04
+:ARCHIVE_FILE: ~/dados/BCC/8P/am/semana_5/ativ.org
+:ARCHIVE_OLPATH: 2. (25 pontos)
+:ARCHIVE_CATEGORY: ativ
+:END:
+Calcule a diferença das 100 taxas de acerto.
+
+
+#+BEGIN_SRC python :session segundo :results output
+  arq_lista = open("wine.data", "r")
+  linhas = list(map(lambda linha : linha.replace("\n", ""), arq_lista.readlines()))
+  linhas = list(map(lambda linha: linha.split(','), linhas))
+
+  from warnings import simplefilter
+  # ignore all future warnings
+  simplefilter(action='ignore', category=FutureWarning)
+
+  from sklearn.neighbors import KNeighborsClassifier
+  import numpy as np
+  def nn_1(base_treino, ex):
+    # remove classificação
+    treino_x = list(map(lambda e : e[1:], base_treino))
+    # transforma em floats
+    treino_x = list(map(lambda e : list(map(lambda o : float(o), e)), treino_x))
+    # só as classificações
+    treino_y = list(map(lambda e : e[0], base_treino))
+
+    knn = KNeighborsClassifier(n_neighbors=1, algorithm="brute", metric="minkowski", p=2)
+    knn.fit(treino_x, treino_y)
+
+    tx = ex[1:]
+    ty = ex[0]
+
+    if ty == knn.predict([tx])[0]:
+      return 1
+    else:
+      return 0
+
+    return 0
+
+
+  def nn_3(base_treino, ex):
+    # remove classificação
+    treino_x = list(map(lambda e : e[1:], base_treino))
+    # transforma em floats
+    treino_x = list(map(lambda e : list(map(lambda o : float(o), e)), treino_x))
+    # só as classificações
+    treino_y = list(map(lambda e : e[0], base_treino))
+
+    knn = KNeighborsClassifier(n_neighbors=3, algorithm="brute", metric="minkowski", p=2, weights="distance")
+    knn.fit(treino_x, treino_y)
+
+    tx = ex[1:]
+    ty = ex[0]
+
+    if ty == knn.predict([tx])[0]:
+      return 1
+    else:
+      return 0
+
+    return 0
+
+
+
+  holdouts = 1
+  import random
+  from functools import reduce 
+  num_acertos = []
+  for i in range(holdouts):
+    # aleatoriza a ordem dos dados
+    random.shuffle(linhas)
+    random.shuffle(linhas)
+    random.shuffle(linhas)
+
+    treino = linhas[:len(linhas)//2]
+    testes = linhas[len(linhas)//2:]
+    print(len(linhas)//2)
+    num_acertos.append((
+      sum(map(lambda e : nn_1(treino, e), testes)),
+      sum(map(lambda e : nn_3(treino, e), testes))
+    ))
+
+  print(num_acertos)
+#+END_SRC
+
+#+RESULTS:
+: 89
+: [(63, 62)]
+

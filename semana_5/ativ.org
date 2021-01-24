@@ -1,0 +1,754 @@
+* 1. (25 pontos)
+Realize 100 repetições de Holdout 50/50 na base Iris archive.ics.uci.edu/ml/datasets/iris
+utilizando o classicador 1-NN com distância Euclidiana então realize os procedimentos abaixo.
+
+#+BEGIN_SRC bash
+wget -nc http://archive.ics.uci.edu/ml/machine-learning-databases/iris/iris.data
+file iris.data
+#+END_SRC
+
+#+RESULTS:
+: iris.data: CSV text
+
+
+** (a)
+Mostre a média, o máximo e o mínimo das taxas de acerto.
+
+#+BEGIN_SRC python :session primeiro :results output
+  arq_lista = open("iris.data", "r")
+  linhas = list(map(lambda linha : linha.replace("\n", ""), arq_lista.readlines()))
+  linhas = list(map(lambda linha: linha.split(','), linhas))
+  #print(linhas[-1])
+  linhas.pop()
+  #print(linhas[-1])
+
+  from warnings import simplefilter
+  # ignore all future warnings
+  simplefilter(action='ignore', category=FutureWarning)
+
+  from sklearn.neighbors import KNeighborsClassifier
+  import numpy as np
+  def nn_1(base_treino, ex):
+    # remove classificação
+    treino_x = list(map(lambda e : e[:-1], base_treino))
+    # transforma em floats
+    treino_x = list(map(lambda e : list(map(lambda o : float(o), e)), treino_x))
+    # só as classificações
+    treino_y = list(map(lambda e : e[-1], base_treino))
+
+    knn = KNeighborsClassifier(n_neighbors=1, algorithm="brute", metric="minkowski", p=2)
+    knn.fit(treino_x, treino_y)
+
+    tx = ex[:-1]
+    ty = ex[-1]
+
+    if ty == knn.predict([tx])[0]:
+      return 1
+    else:
+      return 0
+
+    return 0
+
+
+  holdouts = 100
+  import random
+  from functools import reduce 
+  num_acertos = []
+  for i in range(holdouts):
+    # aleatoriza a ordem dos dados
+    random.shuffle(linhas)
+    random.shuffle(linhas)
+    random.shuffle(linhas)
+
+    treino = linhas[:len(linhas)//2]
+    testes = linhas[len(linhas)//2:]
+    num_acertos.append(reduce(lambda a, b : a + b, (map(lambda e : nn_1(treino, e), testes))))
+
+  taxas_acerto = list(map(lambda a :  a / (len(linhas)//2), num_acertos))
+  media_taxas_acerto = sum(taxas_acerto) / len(taxas_acerto)
+  print("Media de " + str(sum(num_acertos) / len(num_acertos)) + " acertos dos " + str(len(linhas)//2) + ", ou " + str(media_taxas_acerto * 100) + "% de acerto")
+  print("Taxa de acertos maxima de " + str(max(taxas_acerto) * 100) + "%: " + str(max(num_acertos)) + "/" + str(len(linhas)//2))
+  print("Taxa de acertos minima de " + str(min(taxas_acerto) * 100) + "%: " + str(min(num_acertos)) + "/" + str(len(linhas)//2))
+#+END_SRC
+
+#+RESULTS:
+: Python 3.9.1 (default, Dec 13 2020, 11:55:53) 
+: [GCC 10.2.0] on linux
+: Type "help", "copyright", "credits" or "license" for more information.
+: Media de 71.58 acertos dos 75, ou 95.43999999999998% de acerto
+: Taxa de acertos maxima de 100.0%: 75/75
+: Taxa de acertos minima de 89.33333333333333%: 67/75
+: python.el: native completion setup loaded
+
+** (b)
+Mostre o histograma das taxas de acerto.
+
+#+BEGIN_SRC python :session primeiro :results output
+  
+  acertos = []
+
+  for n in num_acertos:
+    for i, (q, f) in enumerate(acertos):
+      if q == n:
+        acertos[i] = (q, f+1)
+        break
+    else:
+      acertos.append((n, 1))
+
+  acertos.sort(key=lambda e: e[0])
+
+  hist_x = list(map(lambda a : a[0], acertos))
+  hist_y = list(map(lambda a : a[1], acertos))
+  
+  print(acertos)
+  import matplotlib.pyplot as plt
+  n, bins, patches = plt.hist(num_acertos)
+  plt.xlabel("Numero de acertos")
+  plt.ylabel("Frequencia")
+  plt.title("Histograma")
+  plt.grid(True)
+  plt.show()
+
+#+END_SRC
+
+#+RESULTS:
+: [(67, 1), (68, 2), (69, 4), (70, 14), (71, 25), (72, 25), (73, 23), (74, 5), (75, 1)]
+
+** (c)
+Calcule o intervalo de conanças das taxas de acerto.
+#+BEGIN_SRC python :session primeiro :results output
+  import statistics 
+  media_taxa_acerto_amostral = media_taxas_acerto
+  desvio_padrao_taxa_acerto_amostral = statistics.stdev(taxas_acerto)
+  taxas_acertos_amostrais_normalizadas = list(map(lambda e : (e - media_taxa_acerto_amostral) / desvio_padrao_taxa_acerto_amostral, taxas_acerto))
+  #se segue a normal padrao, deveria ser x̅ +- z_a/2 * σ / √n
+  intervalo_de_confianca_95 = (media_taxa_acerto_amostral - (1.96 * desvio_padrao_taxa_acerto_amostral), media_taxa_acerto_amostral + (1.96 * desvio_padrao_taxa_acerto_amostral))
+  print(intervalo_de_confianca_95)
+#+END_SRC
+
+#+RESULTS:
+: (0.9164873287471538, 0.9923126712528458)
+
+o intervalo de confianca pra 100 e pra 10000 nem mudou
+#+RESULTS de 10000:
+: (0.918205091964375, 0.9881495747022383)
+
+** (d)
+Qual a taxa mínima de taxa de acerto que você espera ao aplicar este classicador, sob as
+mesmas condições de treinamento, para dados nunca vistos?
+
+Com 5% de chance de estar errado, 91.9% é o pior resultado que esse classicador pode ter
+
+** (e)
+Qual a taxa de acerto esperada para o classicador quando aplicada a dados nunca antes
+vistos.
+
+#+BEGIN_SRC python :session primeiro :results output
+  #soma de um map nem deveria existir
+  esperanca = sum(map(lambda acerto : acerto[0] * (acerto[1]/holdouts), acertos))
+  #assim como no histograma
+  print(esperanca / 75)
+#+END_SRC
+
+#+RESULTS:
+: 0.9544
+
+* 2. (25 pontos)
+Realize um experimento PAREADO com 100 repetições de Holdout 50/50 na base
+Wine archive.ics.uci.edu/ml/datasets/Wine utilizando os classicadores 1-NN e 3-NN
+com Peso, utilizando distância Euclidiana, então realize os procedimentos abaixo.
+
+
+#+BEGIN_SRC bash
+wget -nc http://archive.ics.uci.edu/ml/machine-learning-databases/wine/wine.data
+file wine.data
+#+END_SRC
+
+#+RESULTS:
+: wine.data: CSV text
+
+** (a)
+Calcule a diferença das 100 taxas de acerto.
+
+
+#+BEGIN_SRC python :session segundo :results output
+  arq_lista = open("wine.data", "r")
+  linhas = list(map(lambda linha : linha.replace("\n", ""), arq_lista.readlines()))
+  linhas = list(map(lambda linha: linha.split(','), linhas))
+
+  from warnings import simplefilter
+  # ignore all future warnings
+  simplefilter(action='ignore', category=FutureWarning)
+
+  from sklearn.neighbors import KNeighborsClassifier
+  import numpy as np
+
+  def t_treino(base_treino):
+    # remove classificação
+    treino_x = list(map(lambda e : e[1:], base_treino))
+    # transforma em floats
+    treino_x = list(map(lambda e : list(map(lambda o : float(o), e)), treino_x))
+    # só as classificações
+    treino_y = list(map(lambda e : e[0], base_treino))
+
+    return (treino_x, treino_y)
+
+
+  def ex_t(ex):
+    tx = ex[1:]
+    ty = ex[0]
+
+    return (tx, ty)
+
+  def nn_1(base_treino, ex):
+    (treino_x, treino_y) = t_treino(base_treino)
+
+    knn = KNeighborsClassifier(n_neighbors=1, algorithm="brute", metric="minkowski", p=2)
+    knn.fit(treino_x, treino_y)
+
+    (tx, ty) = ex_t(ex)
+  
+    if ty == knn.predict([tx])[0]:
+      return 1
+    else:
+      return 0
+
+    return 0
+
+
+  def nn_3(base_treino, ex):
+    (treino_x, treino_y) = t_treino(base_treino)
+
+    knn = KNeighborsClassifier(n_neighbors=3, algorithm="brute", metric="minkowski", p=2, weights="distance")
+    knn.fit(treino_x, treino_y)
+
+    (tx, ty) = ex_t(ex)
+  
+    if ty == knn.predict([tx])[0]:
+      return 1
+    else:
+      return 0
+
+    return 0
+    
+
+
+  holdouts = 100
+  import random
+  from functools import reduce 
+  num_acertos = []
+  for i in range(holdouts):
+    # aleatoriza a ordem dos dados
+    random.shuffle(linhas)
+    random.shuffle(linhas)
+    random.shuffle(linhas)
+
+    treino = linhas[:len(linhas)//2]
+    testes = linhas[len(linhas)//2:]
+    num_acertos.append((
+      sum(map(lambda e : nn_1(treino, e), testes)),
+      sum(map(lambda e : nn_3(treino, e), testes))
+    ))
+
+  taxas_acertos = list(map(lambda q : (q[0]/(len(linhas)//2), q[1]/(len(linhas)//2)), num_acertos))
+  diferencas_taxas_acertos = list(map(lambda t : t[0] - t[1], taxas_acertos))
+  print(diferencas_taxas_acertos)
+#+END_SRC
+
+#+RESULTS:
+: Python 3.9.1 (default, Dec 13 2020, 11:55:53) 
+: [GCC 10.2.0] on linux
+: Type "help", "copyright", "credits" or "license" for more information.
+: [0.0, 0.022471910112359494, -0.101123595505618, 0.011235955056179692, 0.0, 0.0, 0.0, -0.0561797752808989, 0.011235955056179803, 0.0449438202247191, -0.022471910112359494, -0.022471910112359605, -0.0449438202247191, 0.0449438202247191, -0.011235955056179803, 0.022471910112359494, 0.05617977528089879, -0.011235955056179692, 0.0449438202247191, 0.03370786516853941, 0.022471910112359605, 0.03370786516853941, 0.022471910112359605, 0.0561797752808989, 0.0561797752808989, 0.011235955056179803, 0.0674157303370787, 0.0449438202247191, 0.0674157303370786, 0.0, 0.0, -0.011235955056179803, 0.0561797752808989, 0.022471910112359605, 0.03370786516853941, 0.022471910112359494, -0.0337078651685393, 0.03370786516853941, -0.022471910112359605, 0.0561797752808989, -0.0449438202247191, -0.0786516853932584, -0.011235955056179803, 0.05617977528089879, -0.011235955056179803, -0.03370786516853941, 0.011235955056179692, 0.022471910112359494, -0.07865168539325851, 0.0337078651685393, -0.022471910112359494, -0.011235955056179803, 0.0337078651685393, -0.022471910112359605, -0.03370786516853941, 0.022471910112359605, 0.0449438202247191, 0.022471910112359494, 0.011235955056179803, -0.011235955056179803, 0.022471910112359605, -0.022471910112359605, 0.011235955056179803, -0.022471910112359605, 0.011235955056179803, 0.011235955056179803, 0.0, 0.0337078651685393, -0.022471910112359605, -0.022471910112359494, -0.011235955056179803, 0.022471910112359605, 0.0, 0.0337078651685393, 0.0, -0.0561797752808989, -0.03370786516853941, -0.022471910112359494, -0.011235955056179803, -0.022471910112359494, 0.0561797752808989, 0.0674157303370787, 0.0, 0.03370786516853941, -0.022471910112359494, 0.0, -0.0674157303370787, 0.0449438202247191, -0.011235955056179692, 0.011235955056179803, -0.0449438202247191, 0.0337078651685393, -0.022471910112359494, -0.011235955056179803, -0.0561797752808989, 0.022471910112359605, 0.0337078651685393, 0.0, 0.022471910112359494, -0.022471910112359494]
+: python.el: native completion setup loaded
+
+** (b)
+Calcule o intervalo de conança destas diferenças.
+
+#+BEGIN_SRC python :session segundo :results output
+  import statistics
+  media_das_diferencas_das_taxas_de_acerto = statistics.mean(diferencas_taxas_acertos)
+  desvio_padrao_das_diferencas_das_taxas_de_acerto = statistics.stdev(diferencas_taxas_acertos)
+  print("Media: " + str(media_das_diferencas_das_taxas_de_acerto))
+  print("Desvio padrao: " + str(desvio_padrao_das_diferencas_das_taxas_de_acerto))
+  intervalo = (
+      media_das_diferencas_das_taxas_de_acerto - 1.96*desvio_padrao_das_diferencas_das_taxas_de_acerto,
+      media_das_diferencas_das_taxas_de_acerto + 1.96*desvio_padrao_das_diferencas_das_taxas_de_acerto
+  )
+
+  print("Intervalo de confianca pra 95% de certeza: " + str(intervalo))
+#+END_SRC
+
+#+RESULTS:
+: Media: 0.004269662921348314
+: Desvio padrao: 0.03508989180155062
+: Intervalo de confianca pra 95% de certeza: (-0.06450652500969091, 0.07304585085238753)
+
+** (c)
+Realize o teste de hipótese sobre estas diferenças para vericar se a taxa de acerto do 1-NN
+é signicativamente diferente da taxa de acerto do 3-NN com peso. Mostre sua conclusão
+para o teste.
+
+*** Restposta 
+O intervalo de confiança compreende o 0, então existe uma possibilidade das taxas de acerto
+serem iguais, já que a media população está com 95% de certeza dentro do intervalo e por
+isso os classicadores podem ser equivalentes. Então ainda não podemos tirar conclusões sobre
+quem é o melhor.
+
+** (d)
+Calcule o intervalo de conança da taxa de acerto de cada classicador.
+
+#+BEGIN_SRC python :session segundo :results output
+  num_acertos_1_nn = []
+  for i in range(holdouts):
+    # aleatoriza a ordem dos dados
+    random.shuffle(linhas)
+    random.shuffle(linhas)
+    random.shuffle(linhas)
+
+    treino = linhas[:len(linhas)//2]
+    testes = linhas[len(linhas)//2:]
+    num_acertos_1_nn.append(sum(map(lambda e : nn_1(treino, e), testes)))
+
+  num_acertos_3_nn = []
+  for i in range(holdouts):
+    # aleatoriza a ordem dos dados
+    random.shuffle(linhas)
+    random.shuffle(linhas)
+    random.shuffle(linhas)
+
+    treino = linhas[:len(linhas)//2]
+    testes = linhas[len(linhas)//2:]
+    num_acertos_3_nn.append(sum(map(lambda e : nn_3(treino, e), testes)))
+
+
+  taxas_acertos_1_nn = list(map(lambda q : q / (len(linhas)//2), num_acertos_1_nn))
+  taxas_acertos_3_nn = list(map(lambda q : q / (len(linhas)//2), num_acertos_3_nn))
+
+  import statistics
+  media_taxas_acertos_1_nn = statistics.mean(taxas_acertos_1_nn)
+  media_taxas_acertos_3_nn = statistics.mean(taxas_acertos_3_nn)
+
+  dp_taxas_acertos_1_nn = statistics.stdev(taxas_acertos_1_nn)
+  dp_taxas_acertos_3_nn = statistics.stdev(taxas_acertos_3_nn)
+
+  print("Media 1 nn: " + str(media_taxas_acertos_1_nn))
+  print("DP 1 nn: " + str(dp_taxas_acertos_1_nn))
+  print("")
+  print("Media 3 nn: " + str(media_taxas_acertos_3_nn))
+  print("DP 3 nn: " + str(dp_taxas_acertos_3_nn))
+  print("")
+  intervalo_1_nn = (
+      media_taxas_acertos_1_nn - 1.96*dp_taxas_acertos_1_nn,
+      media_taxas_acertos_1_nn + 1.96*dp_taxas_acertos_1_nn,
+  )
+
+  intervalo_3_nn = (
+      media_taxas_acertos_3_nn - 1.96*dp_taxas_acertos_3_nn,
+      media_taxas_acertos_3_nn + 1.96*dp_taxas_acertos_3_nn,
+  )
+
+  print("Intervalo de confianca pra 95% de certeza da 1nn: " + str(intervalo_1_nn))
+  print("Intervalo de confianca pra 95% de certeza da 3nn: " + str(intervalo_3_nn))
+#+END_SRC
+
+#+RESULTS:
+: Media 1 nn: 0.7119101123595506
+: DP 1 nn: 0.040259836341798326
+: 
+: Media 3 nn: 0.7126966292134831
+: DP 3 nn: 0.03477870069207876
+: 
+: Intervalo de confianca pra 95% de certeza da 1nn: (0.6330008331296259, 0.7908193915894753)
+: Intervalo de confianca pra 95% de certeza da 3nn: (0.6445303758570087, 0.7808628825699575)
+
+** (e)
+Realize o teste de hipótese de sobreposição dos intervalos de conança. Mostre sua con-
+clusão para o teste.
+
+*** Resposta
+Existe sobreposição dos intervalos, então a taxa real de acerto para a população desse classicador
+pode estar na mesma região, supomos, 72%. Os dois classicadores podem ter 72% de acerto, então não
+dá pra dizer qual dos dois é o melhor classicador.
+
+* 3. (25 pontos)
+Utilizando o classicador k-NN na base Wine archive.ics.uci.edu/ml/datasets/
+Wine, teste os valores k = 1, . . . , 15. Para qual valor de k o classicador apresenta uma taxa de
+acerto signicativamente maior? Dena a metodologia utilizada para justicar sua resposta.
+
+#+BEGIN_SRC python :session terceiro :results output
+  arq_lista = open("wine.data", "r")
+  linhas = list(map(lambda linha : linha.replace("\n", ""), arq_lista.readlines()))
+  linhas = list(map(lambda linha: linha.split(','), linhas))
+
+  from warnings import simplefilter
+  # ignore all future warnings
+  simplefilter(action='ignore', category=FutureWarning)
+
+  from sklearn.neighbors import KNeighborsClassifier
+  import numpy as np
+
+  def t_treino(base_treino):
+    # remove classificação
+    treino_x = list(map(lambda e : e[1:], base_treino))
+    # transforma em floats
+    treino_x = list(map(lambda e : list(map(lambda o : float(o), e)), treino_x))
+    # só as classificações
+    treino_y = list(map(lambda e : e[0], base_treino))
+
+    return (treino_x, treino_y)
+
+
+  def ex_t(ex):
+    tx = ex[1:]
+    ty = ex[0]
+
+    return (tx, ty)
+
+  def knn(k, base_treino, ex):
+    (treino_x, treino_y) = t_treino(base_treino)
+
+    knn = KNeighborsClassifier(n_neighbors=k, algorithm="brute", metric="minkowski", p=2)
+    knn.fit(treino_x, treino_y)
+
+    (tx, ty) = ex_t(ex)
+
+    if ty == knn.predict([tx])[0]:
+      return 1
+    else:
+      return 0
+
+    return 0
+
+  intervalos = []
+  holdouts = 100
+
+  import random
+  import statistics
+
+  for k in range(15):
+    num_acertos = []
+    for i in range(holdouts):
+      # aleatoriza a ordem dos dados
+      random.shuffle(linhas)
+      random.shuffle(linhas)
+      random.shuffle(linhas)
+
+      treino = linhas[:len(linhas)//2]
+      testes = linhas[len(linhas)//2:]
+      num_acertos.append(sum(map(lambda e : knn(k+1, treino, e), testes)))
+
+    taxas_acerto = list(map(lambda q : q/(len(linhas)//2), num_acertos))
+    media_taxas_acerto = statistics.mean(taxas_acerto)
+    dp_taxas_acerto = statistics.stdev(taxas_acerto)
+    intervalo = (
+      media_taxas_acerto - 1.96*dp_taxas_acerto,
+      media_taxas_acerto + 1.96*dp_taxas_acerto
+    )
+    intervalos.append(intervalo)
+
+  comprimentos = list(map(lambda e : e[1] - e[0], intervalos))
+
+  intervalos_comprimentos = list(zip(intervalos, comprimentos))
+  for k, (intervalo, comprimento) in enumerate(intervalos_comprimentos):
+    lista.append((k+1, intervalo, comprimento))
+ 
+ 
+  lista.sort(key=lambda e : e[2])
+
+
+  for (k, intervalo, comprimento) in lista:
+    print(k)
+    print(intervalo)
+    print(comprimento)
+    print("")
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+10
+(0.6193364241526115, 0.7572927893305347)
+0.1379563651779232
+
+0
+(0.7616163783057509, 0.9015296891099794)
+0.13991331080422853
+
+14
+(0.6244580293641164, 0.7676768020965576)
+0.1432187727324412
+
+12
+(0.6241507338180852, 0.7688829740470833)
+0.1447322402289981
+
+15
+(0.617858935478084, 0.7639388173309046)
+0.14607988185282061
+
+3
+(0.6173928585481903, 0.7637307369574278)
+0.1463378784092375
+
+6
+(0.6135349365760357, 0.7608470858958744)
+0.1473121493198386
+
+11
+(0.6158297628512729, 0.7643949562498508)
+0.14856519339857788
+
+8
+(0.6042095903868113, 0.7528690612985819)
+0.14865947091177056
+
+9
+(0.6111703465553502, 0.7611892040064476)
+0.15001885745109744
+
+5
+(0.6126643611113731, 0.7637401332706493)
+0.15107577215927614
+
+1
+(0.639258213052385, 0.7906294273970533)
+0.15137121434466838
+
+2
+(0.7255188272304988, 0.8771778019829845)
+0.1516589747524857
+
+1
+(0.7025539801935866, 0.8545246714918066)
+0.15197069129821994
+
+7
+(0.6104887939906452, 0.7650168239868829)
+0.15452802999623771
+
+13
+(0.6113227211038897, 0.7671042451882452)
+0.15578152408435542
+
+4
+(0.7019646670415308, 0.8629791531831882)
+0.16101448614165736
+
+4
+(0.6041280408287748, 0.765984318721787)
+0.16185627789301216
+
+2
+(0.5841390843461416, 0.7479957471145326)
+0.16385666276839106
+
+5
+(0.664692345392889, 0.8472177669666616)
+0.1825254215737726
+
+8
+(0.6500051592407864, 0.8335903463771911)
+0.1835851871364047
+
+3
+(0.6893893931493768, 0.8764533034798366)
+0.18706391033045988
+
+6
+(0.6653369049148262, 0.852865342276185)
+0.18752843736135882
+
+7
+(0.6496168550454842, 0.8400460663028304)
+0.19042921125734624
+
+9
+(0.6332547808299652, 0.8319137584958775)
+0.19865897766591223
+
+13
+(0.5856455531570652, 0.794803885045182)
+0.20915833188811672
+
+10
+(0.6171568668703943, 0.8316071780734259)
+0.2144503112030316
+
+12
+(0.5908376321317141, 0.8064657386548026)
+0.2156281065230885
+
+11
+(0.6052098637945725, 0.8222058665425062)
+0.21699600274793363
+
+14
+(0.5853415150022678, 0.8063438782561592)
+0.22100236325389133
+#+end_example
+
+*** Resposta
+Nenhum classicador tem uma taxa de acerto signicativamente maior, todos eles podem ter, por exemplo
+70% de taxa de acerto quando expostos à população.
+
+* 4. (25 pontos)
+Remover a última coluna da base Wine archive.ics.uci.edu/ml/datasets/Wine
+aumenta signicativamente a taxa de acerto? Dena a metodologia utilizada para justicar
+sua resposta.
+
+
+#+BEGIN_SRC python :session quarto :results output
+  arq_lista = open("wine.data", "r")
+  linhas = list(map(lambda linha : linha.replace("\n", ""), arq_lista.readlines()))
+  linhas = list(map(lambda linha: linha.split(','), linhas))
+
+  from warnings import simplefilter
+  # ignore all future warnings
+  simplefilter(action='ignore', category=FutureWarning)
+
+  from sklearn.neighbors import KNeighborsClassifier
+  import numpy as np
+
+  def t_treino(base_treino):
+    # remove classificação
+    treino_x = list(map(lambda e : e[1:-1], base_treino))
+    # transforma em floats
+    treino_x = list(map(lambda e : list(map(lambda o : float(o), e)), treino_x))
+    # só as classificações
+    treino_y = list(map(lambda e : e[0], base_treino))
+
+    return (treino_x, treino_y)
+
+
+  def ex_t(ex):
+    tx = ex[1:-1]
+    ty = ex[0]
+
+    return (tx, ty)
+
+  def knn(k, base_treino, ex):
+    (treino_x, treino_y) = t_treino(base_treino)
+
+    knn = KNeighborsClassifier(n_neighbors=k, algorithm="brute", metric="minkowski", p=2)
+    knn.fit(treino_x, treino_y)
+
+    (tx, ty) = ex_t(ex)
+
+    if ty == knn.predict([tx])[0]:
+      return 1
+    else:
+      return 0
+
+    return 0
+
+  intervalos = []
+  holdouts = 100
+
+  import random
+  import statistics
+
+  for k in range(15):
+    num_acertos = []
+    for i in range(holdouts):
+      # aleatoriza a ordem dos dados
+      random.shuffle(linhas)
+      random.shuffle(linhas)
+      random.shuffle(linhas)
+
+      treino = linhas[:len(linhas)//2]
+      testes = linhas[len(linhas)//2:]
+      num_acertos.append(sum(map(lambda e : knn(k+1, treino, e), testes)))
+
+    taxas_acerto = list(map(lambda q : q/(len(linhas)//2), num_acertos))
+    media_taxas_acerto = statistics.mean(taxas_acerto)
+    dp_taxas_acerto = statistics.stdev(taxas_acerto)
+    intervalo = (
+      media_taxas_acerto - 1.96*dp_taxas_acerto,
+      media_taxas_acerto + 1.96*dp_taxas_acerto
+    )
+    intervalos.append(intervalo)
+
+  comprimentos = list(map(lambda e : e[1] - e[0], intervalos))
+
+  intervalos_comprimentos = list(zip(intervalos, comprimentos))
+  lista = []
+
+  for k, (intervalo, comprimento) in enumerate(intervalos_comprimentos):
+    lista.append((k+1, intervalo, comprimento))
+ 
+ 
+  lista.sort(key=lambda e : e[2])
+
+
+  for (k, intervalo, comprimento) in lista:
+    print(k)
+    print(intervalo)
+    print(comprimento)
+    print("")
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+0
+(0.7616163783057509, 0.9015296891099794)
+0.13991331080422853
+
+2
+(0.7255188272304988, 0.8771778019829845)
+0.1516589747524857
+
+1
+(0.7025539801935866, 0.8545246714918066)
+0.15197069129821994
+
+4
+(0.7019646670415308, 0.8629791531831882)
+0.16101448614165736
+
+5
+(0.664692345392889, 0.8472177669666616)
+0.1825254215737726
+
+8
+(0.6500051592407864, 0.8335903463771911)
+0.1835851871364047
+
+3
+(0.6893893931493768, 0.8764533034798366)
+0.18706391033045988
+
+6
+(0.6653369049148262, 0.852865342276185)
+0.18752843736135882
+
+7
+(0.6496168550454842, 0.8400460663028304)
+0.19042921125734624
+
+9
+(0.6332547808299652, 0.8319137584958775)
+0.19865897766591223
+
+13
+(0.5856455531570652, 0.794803885045182)
+0.20915833188811672
+
+10
+(0.6171568668703943, 0.8316071780734259)
+0.2144503112030316
+
+12
+(0.5908376321317141, 0.8064657386548026)
+0.2156281065230885
+
+11
+(0.6052098637945725, 0.8222058665425062)
+0.21699600274793363
+
+14
+(0.5853415150022678, 0.8063438782561592)
+0.22100236325389133
+#+end_example
+
+
+agora parece que quanto menor o intervalo, maior a minima taxa possivel de acerto
