@@ -1,0 +1,800 @@
+#+TITLE: Semana 7
+#+STARTUP: overview
+* 1. (10 pontos)
+Converta todos os atributos da base Student Performance para numéricos.
+https://archive.ics.uci.edu/ml/datasets/Student+Performance
+
+vou usar o de matematica pq sim
+#+BEGIN_SRC bash
+wget -nc https://archive.ics.uci.edu/ml/machine-learning-databases/00320/student.zip #baixa se necessario
+file  student.zip
+unzip -u student.zip #unzip só da update
+file student-mat.csv
+#+END_SRC
+
+#+BEGIN_SRC python
+
+arq_lista = open("student-mat.csv", "r")
+linhas = list(map(lambda linha : linha.replace("\n", ""), arq_lista.readlines()))
+
+# substituindo os yes e no por 1 e -1 aqui é mais eficiente
+linhas = list(map(lambda linha : linha.replace("\"yes\"", "1"), linhas))
+linhas = list(map(lambda linha : linha.replace("\"no\"", "-1"), linhas))
+linhas = list(map(lambda linha: linha.split(';'), linhas))
+linhas.reverse()
+cabecalho = linhas.pop()
+linhas.reverse()
+
+linhas = linhas[:len(linhas)//8]
+novas_linhas = []
+
+for linha in linhas:
+
+  nova_linha = []
+
+  #1 school - student's school (binary: 'GP' - Gabriel Pereira or 'MS' - Mousinho da Silveira)
+  #GP == 1
+  #MS == -1
+  idx = 1 - 1
+  nova_linha.append(1 if str(linha[idx]) == "\"GP\"" else -1)
+
+
+  #2 sex - student's sex (binary: 'F' - female or 'M' - male)
+  #F == 1
+  #M == -1
+  idx = 2 - 1
+  nova_linha.append(1 if str(linha[idx]) == "\"F\"" else -1)
+
+
+  # copia o 3
+  idx = 3 - 1
+  nova_linha.append(linha[idx])
+
+
+  #4 address - student's home address type (binary: 'U' - urban or 'R' - rural)
+  #U == 1
+  #R == -1
+  idx = 4 - 1
+  nova_linha.append(1 if str(linha[idx]) == "\"U\"" else -1)
+
+  
+  #5 famsize - family size (binary: 'LE3' - less or equal to 3 or 'GT3' - greater than 3)
+  #LE3 == 1
+  #GT3 == -1
+  idx = 5 - 1
+  nova_linha.append(1 if str(linha[idx]) == "\"LE3\"" else -1)
+
+  
+  #6 Pstatus - parent's cohabitation status (binary: 'T' - living together or 'A' - apart)
+  #LE3 == 1
+  #GT3 == -1
+  idx = 6 - 1
+  nova_linha.append(1 if str(linha[idx]) == "\"T\"" else -1)
+
+
+  # copia o 7
+  idx = 7 - 1
+  nova_linha.append(linha[idx])
+
+
+  # copia o 8
+  idx = 8 - 1
+  nova_linha.append(linha[idx])
+
+
+  #9 Mjob - mother's job (nominal: 'teacher', 'health' care related, civil 'services' (e.g. administrative or police), 'at_home' or 'other')
+  idx = 9 - 1
+  if str(linha[idx]) == "\"teacher\"":
+    nova_linha.extend([1, -1, -1, -1, -1])
+  elif str(linha[idx]) == "\"health\"":
+    nova_linha.extend([-1, 1, -1, -1, -1])
+  elif str(linha[idx]) == "\"services\"":
+    nova_linha.extend([-1, -1, 1, -1, -1])
+  elif str(linha[idx]) == "\"at_home\"":
+    nova_linha.extend([-1, -1, -1, 1, -1])
+  elif str(linha[idx]) == "\"other\"":
+    nova_linha.extend([-1, -1, -1, -1, 1])
+
+
+  #10 Fjob - father's job (nominal: 'teacher', 'health' care related, civil 'services' (e.g. administrative or police), 'at_home' or 'other')
+  idx = 10 - 1
+  if str(linha[idx]) == "\"teacher\"":
+    nova_linha.extend([1, -1, -1, -1, -1])
+  elif str(linha[idx]) == "\"health\"":
+    nova_linha.extend([-1, 1, -1, -1, -1])
+  elif str(linha[idx]) == "\"services\"":
+    nova_linha.extend([-1, -1, 1, -1, -1])
+  elif str(linha[idx]) == "\"at_home\"":
+    nova_linha.extend([-1, -1, -1, 1, -1])
+  elif str(linha[idx]) == "\"other\"":
+    nova_linha.extend([-1, -1, -1, -1, 1])
+
+  #11 reason - reason to choose this school (nominal: close to 'home', school 'reputation', 'course' preference or 'other')
+  idx = 11 - 1
+  if str(linha[idx]) == "\"home\"":
+    nova_linha.extend([1, -1, -1, -1])
+  elif str(linha[idx]) == "\"reputation\"":
+    nova_linha.extend([-1, 1, -1, -1])
+  elif str(linha[idx]) == "\"course\"":
+    nova_linha.extend([-1, -1, 1, -1])
+  elif str(linha[idx]) == "\"other\"":
+    nova_linha.extend([-1, -1, -1, 1])
+
+
+  #12 guardian - student's guardian (nominal: 'mother', 'father' or 'other')
+  idx = 12 - 1
+  if str(linha[idx]) == "\"mother\"":
+    nova_linha.extend([1, -1, -1])
+  elif str(linha[idx]) == "\"father\"":
+    nova_linha.extend([-1, 1, -1])
+  elif str(linha[idx]) == "\"other\"":
+    nova_linha.extend([-1, -1, 1])
+
+
+
+  # copia da 13 até a final
+  for idx in range(13 - 1, len(linha)):
+    #tira as aspas
+    if idx == 30 or idx == 31:
+      nova_linha.append(linha[idx].replace("\"", ""))
+    else:
+      nova_linha.append(linha[idx])
+
+
+
+  novas_linhas.append(nova_linha)
+
+
+return novas_linhas
+#+END_SRC
+
+#+RESULTS:
+| 1 |  1 | 18 |  1 | -1 | -1 | 4 | 4 | -1 | -1 | -1 |  1 | -1 |  1 | -1 | -1 | -1 | -1 | -1 | -1 |  1 | -1 |  1 | -1 | -1 | 2 | 2 | 0 |  1 | -1 | -1 | -1 |  1 | 1 | -1 | -1 | 4 | 3 | 4 | 1 | 1 | 3 |  6 |  5 |  6 |  6 |
+| 1 |  1 | 17 |  1 | -1 |  1 | 1 | 1 | -1 | -1 | -1 |  1 | -1 | -1 | -1 | -1 | -1 |  1 | -1 | -1 |  1 | -1 | -1 |  1 | -1 | 1 | 2 | 0 | -1 |  1 | -1 | -1 | -1 | 1 |  1 | -1 | 5 | 3 | 3 | 1 | 1 | 3 |  4 |  5 |  5 |  6 |
+| 1 |  1 | 15 |  1 |  1 |  1 | 1 | 1 | -1 | -1 | -1 |  1 | -1 | -1 | -1 | -1 | -1 |  1 | -1 | -1 | -1 |  1 |  1 | -1 | -1 | 1 | 2 | 3 |  1 | -1 |  1 | -1 |  1 | 1 |  1 | -1 | 4 | 3 | 2 | 2 | 3 | 3 | 10 |  7 |  8 | 10 |
+| 1 |  1 | 15 |  1 | -1 |  1 | 4 | 2 | -1 |  1 | -1 | -1 | -1 | -1 | -1 |  1 | -1 | -1 |  1 | -1 | -1 | -1 |  1 | -1 | -1 | 1 | 3 | 0 | -1 |  1 |  1 |  1 |  1 | 1 |  1 |  1 | 3 | 2 | 2 | 1 | 1 | 5 |  2 | 15 | 14 | 15 |
+| 1 |  1 | 16 |  1 | -1 |  1 | 3 | 3 | -1 | -1 | -1 | -1 |  1 | -1 | -1 | -1 | -1 |  1 |  1 | -1 | -1 | -1 | -1 |  1 | -1 | 1 | 2 | 0 | -1 |  1 |  1 | -1 |  1 | 1 | -1 | -1 | 4 | 3 | 2 | 1 | 2 | 5 |  4 |  6 | 10 | 10 |
+| 1 | -1 | 16 |  1 |  1 |  1 | 4 | 3 | -1 | -1 |  1 | -1 | -1 | -1 | -1 | -1 | -1 |  1 | -1 |  1 | -1 | -1 |  1 | -1 | -1 | 1 | 2 | 0 | -1 |  1 |  1 |  1 |  1 | 1 |  1 | -1 | 5 | 4 | 2 | 1 | 2 | 5 | 10 | 15 | 15 | 15 |
+| 1 | -1 | 16 |  1 |  1 |  1 | 2 | 2 | -1 | -1 | -1 | -1 |  1 | -1 | -1 | -1 | -1 |  1 |  1 | -1 | -1 | -1 |  1 | -1 | -1 | 1 | 2 | 0 | -1 | -1 | -1 | -1 |  1 | 1 |  1 | -1 | 4 | 4 | 4 | 1 | 1 | 3 |  0 | 12 | 12 | 11 |
+| 1 |  1 | 17 |  1 | -1 | -1 | 4 | 4 | -1 | -1 | -1 | -1 |  1 |  1 | -1 | -1 | -1 | -1 |  1 | -1 | -1 | -1 |  1 | -1 | -1 | 2 | 2 | 0 |  1 |  1 | -1 | -1 |  1 | 1 | -1 | -1 | 4 | 1 | 4 | 1 | 1 | 1 |  6 |  6 |  5 |  6 |
+| 1 | -1 | 15 |  1 |  1 | -1 | 3 | 2 | -1 | -1 |  1 | -1 | -1 | -1 | -1 | -1 | -1 |  1 |  1 | -1 | -1 | -1 |  1 | -1 | -1 | 1 | 2 | 0 | -1 |  1 |  1 | -1 |  1 | 1 |  1 | -1 | 4 | 2 | 2 | 1 | 1 | 1 |  0 | 16 | 18 | 19 |
+| 1 | -1 | 15 |  1 | -1 |  1 | 3 | 4 | -1 | -1 | -1 | -1 |  1 | -1 | -1 | -1 | -1 |  1 |  1 | -1 | -1 | -1 |  1 | -1 | -1 | 1 | 2 | 0 | -1 |  1 |  1 |  1 |  1 | 1 |  1 | -1 | 5 | 5 | 1 | 1 | 1 | 5 |  0 | 14 | 15 | 15 |
+| 1 |  1 | 15 |  1 | -1 |  1 | 4 | 4 |  1 | -1 | -1 | -1 | -1 | -1 |  1 | -1 | -1 | -1 | -1 |  1 | -1 | -1 |  1 | -1 | -1 | 1 | 2 | 0 | -1 |  1 |  1 | -1 |  1 | 1 |  1 | -1 | 3 | 3 | 3 | 1 | 2 | 2 |  0 | 10 |  8 |  9 |
+| 1 |  1 | 15 |  1 | -1 |  1 | 2 | 1 | -1 | -1 |  1 | -1 | -1 | -1 | -1 | -1 | -1 |  1 | -1 |  1 | -1 | -1 | -1 |  1 | -1 | 3 | 3 | 0 | -1 |  1 | -1 |  1 |  1 | 1 |  1 | -1 | 5 | 2 | 2 | 1 | 1 | 4 |  4 | 10 | 12 | 12 |
+| 1 | -1 | 15 |  1 |  1 |  1 | 4 | 4 | -1 |  1 | -1 | -1 | -1 | -1 | -1 |  1 | -1 | -1 | -1 | -1 |  1 | -1 | -1 |  1 | -1 | 1 | 1 | 0 | -1 |  1 |  1 |  1 |  1 | 1 |  1 | -1 | 4 | 3 | 3 | 1 | 3 | 5 |  2 | 14 | 14 | 14 |
+| 1 | -1 | 15 |  1 | -1 |  1 | 4 | 3 |  1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 |  1 | -1 | -1 |  1 | -1 |  1 | -1 | -1 | 2 | 2 | 0 | -1 |  1 |  1 | -1 |  1 | 1 |  1 | -1 | 5 | 4 | 3 | 1 | 2 | 3 |  2 | 10 | 10 | 11 |
+| 1 | -1 | 15 |  1 | -1 | -1 | 2 | 2 | -1 | -1 | -1 | -1 |  1 | -1 | -1 | -1 | -1 |  1 |  1 | -1 | -1 | -1 | -1 | -1 |  1 | 1 | 3 | 0 | -1 |  1 | -1 | -1 |  1 | 1 |  1 |  1 | 4 | 5 | 2 | 1 | 1 | 3 |  0 | 14 | 16 | 16 |
+| 1 |  1 | 16 |  1 | -1 |  1 | 4 | 4 | -1 |  1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 |  1 |  1 | -1 | -1 | -1 |  1 | -1 | -1 | 1 | 1 | 0 | -1 |  1 | -1 | -1 |  1 | 1 |  1 | -1 | 4 | 4 | 4 | 1 | 2 | 2 |  4 | 14 | 14 | 14 |
+| 1 |  1 | 16 |  1 | -1 |  1 | 4 | 4 | -1 | -1 |  1 | -1 | -1 | -1 | -1 |  1 | -1 | -1 | -1 |  1 | -1 | -1 |  1 | -1 | -1 | 1 | 3 | 0 | -1 |  1 |  1 |  1 |  1 | 1 |  1 | -1 | 3 | 2 | 3 | 1 | 2 | 2 |  6 | 13 | 14 | 14 |
+| 1 |  1 | 16 |  1 | -1 |  1 | 3 | 3 | -1 | -1 | -1 | -1 |  1 | -1 | -1 | -1 | -1 |  1 | -1 |  1 | -1 | -1 |  1 | -1 | -1 | 3 | 2 | 0 |  1 |  1 | -1 |  1 |  1 | 1 | -1 | -1 | 5 | 3 | 2 | 1 | 1 | 4 |  4 |  8 | 10 | 10 |
+| 1 | -1 | 17 |  1 | -1 |  1 | 3 | 2 | -1 | -1 |  1 | -1 | -1 | -1 | -1 |  1 | -1 | -1 | -1 | -1 |  1 | -1 |  1 | -1 | -1 | 1 | 1 | 3 | -1 |  1 | -1 |  1 |  1 | 1 |  1 | -1 | 5 | 5 | 5 | 2 | 4 | 5 | 16 |  6 |  5 |  5 |
+| 1 | -1 | 16 |  1 |  1 |  1 | 4 | 3 | -1 |  1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 |  1 |  1 | -1 | -1 | -1 | -1 |  1 | -1 | 1 | 1 | 0 | -1 | -1 |  1 |  1 |  1 | 1 |  1 | -1 | 3 | 1 | 3 | 1 | 3 | 5 |  4 |  8 | 10 | 10 |
+| 1 | -1 | 15 |  1 | -1 |  1 | 4 | 3 |  1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 |  1 | -1 |  1 | -1 | -1 |  1 | -1 | -1 | 1 | 2 | 0 | -1 | -1 | -1 | -1 |  1 | 1 |  1 | -1 | 4 | 4 | 1 | 1 | 1 | 1 |  0 | 13 | 14 | 15 |
+| 1 | -1 | 15 |  1 | -1 |  1 | 4 | 4 | -1 |  1 | -1 | -1 | -1 | -1 |  1 | -1 | -1 | -1 | -1 | -1 | -1 |  1 | -1 |  1 | -1 | 1 | 1 | 0 | -1 |  1 |  1 | -1 |  1 | 1 |  1 | -1 | 5 | 4 | 2 | 1 | 1 | 5 |  0 | 12 | 15 | 15 |
+| 1 | -1 | 16 |  1 |  1 |  1 | 4 | 2 |  1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 |  1 | -1 | -1 |  1 | -1 |  1 | -1 | -1 | 1 | 2 | 0 | -1 | -1 | -1 |  1 |  1 | 1 |  1 | -1 | 4 | 5 | 1 | 1 | 3 | 5 |  2 | 15 | 15 | 16 |
+| 1 | -1 | 16 |  1 |  1 |  1 | 2 | 2 | -1 | -1 | -1 | -1 |  1 | -1 | -1 | -1 | -1 |  1 | -1 |  1 | -1 | -1 |  1 | -1 | -1 | 2 | 2 | 0 | -1 |  1 | -1 |  1 |  1 | 1 |  1 | -1 | 5 | 4 | 4 | 2 | 4 | 5 |  0 | 13 | 13 | 12 |
+| 1 |  1 | 15 | -1 | -1 |  1 | 2 | 4 | -1 | -1 |  1 | -1 | -1 | -1 |  1 | -1 | -1 | -1 | -1 | -1 |  1 | -1 |  1 | -1 | -1 | 1 | 3 | 0 |  1 |  1 |  1 |  1 |  1 | 1 |  1 | -1 | 4 | 3 | 2 | 1 | 1 | 5 |  2 | 10 |  9 |  8 |
+| 1 |  1 | 16 |  1 | -1 |  1 | 2 | 2 | -1 | -1 |  1 | -1 | -1 | -1 | -1 |  1 | -1 | -1 |  1 | -1 | -1 | -1 |  1 | -1 | -1 | 1 | 1 | 2 | -1 |  1 |  1 | -1 | -1 | 1 |  1 | -1 | 1 | 2 | 2 | 1 | 3 | 5 | 14 |  6 |  9 |  8 |
+| 1 | -1 | 15 |  1 | -1 |  1 | 2 | 2 | -1 | -1 | -1 | -1 |  1 | -1 | -1 | -1 | -1 |  1 |  1 | -1 | -1 | -1 |  1 | -1 | -1 | 1 | 1 | 0 | -1 |  1 |  1 | -1 |  1 | 1 |  1 | -1 | 4 | 2 | 2 | 1 | 2 | 5 |  2 | 12 | 12 | 11 |
+| 1 | -1 | 15 |  1 | -1 |  1 | 4 | 2 | -1 |  1 | -1 | -1 | -1 | -1 | -1 |  1 | -1 | -1 | -1 | -1 | -1 |  1 |  1 | -1 | -1 | 1 | 1 | 0 | -1 | -1 |  1 | -1 |  1 | 1 |  1 | -1 | 2 | 2 | 4 | 2 | 4 | 1 |  4 | 15 | 16 | 15 |
+| 1 | -1 | 16 |  1 |  1 | -1 | 3 | 4 | -1 | -1 |  1 | -1 | -1 | -1 | -1 | -1 | -1 |  1 |  1 | -1 | -1 | -1 |  1 | -1 | -1 | 1 | 2 | 0 |  1 |  1 | -1 |  1 |  1 | 1 |  1 | -1 | 5 | 3 | 3 | 1 | 1 | 5 |  4 | 11 | 11 | 11 |
+| 1 | -1 | 16 |  1 | -1 |  1 | 4 | 4 |  1 | -1 | -1 | -1 | -1 |  1 | -1 | -1 | -1 | -1 |  1 | -1 | -1 | -1 |  1 | -1 | -1 | 1 | 2 | 0 | -1 |  1 |  1 |  1 |  1 | 1 |  1 |  1 | 4 | 4 | 5 | 5 | 5 | 5 | 16 | 10 | 12 | 11 |
+| 1 | -1 | 15 |  1 | -1 |  1 | 4 | 4 | -1 |  1 | -1 | -1 | -1 | -1 | -1 |  1 | -1 | -1 |  1 | -1 | -1 | -1 |  1 | -1 | -1 | 1 | 2 | 0 | -1 |  1 |  1 | -1 | -1 | 1 |  1 | -1 | 5 | 4 | 2 | 3 | 4 | 5 |  0 |  9 | 11 | 12 |
+| 1 | -1 | 15 |  1 | -1 |  1 | 4 | 4 | -1 | -1 |  1 | -1 | -1 | -1 | -1 |  1 | -1 | -1 | -1 |  1 | -1 | -1 |  1 | -1 | -1 | 2 | 2 | 0 | -1 |  1 | -1 |  1 |  1 | 1 |  1 | -1 | 4 | 3 | 1 | 1 | 1 | 5 |  0 | 17 | 16 | 17 |
+| 1 | -1 | 15 | -1 | -1 |  1 | 4 | 3 |  1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 |  1 | -1 | -1 | -1 |  1 | -1 |  1 | -1 | -1 | 1 | 2 | 0 | -1 |  1 | -1 |  1 |  1 | 1 |  1 |  1 | 4 | 5 | 2 | 1 | 1 | 5 |  0 | 17 | 16 | 16 |
+| 1 | -1 | 15 |  1 |  1 |  1 | 3 | 3 | -1 | -1 | -1 | -1 |  1 | -1 | -1 | -1 | -1 |  1 | -1 | -1 |  1 | -1 |  1 | -1 | -1 | 1 | 2 | 0 | -1 | -1 | -1 |  1 | -1 | 1 |  1 | -1 | 5 | 3 | 2 | 1 | 1 | 2 |  0 |  8 | 10 | 12 |
+| 1 | -1 | 16 |  1 | -1 |  1 | 3 | 2 | -1 | -1 | -1 | -1 |  1 | -1 | -1 | -1 | -1 |  1 |  1 | -1 | -1 | -1 |  1 | -1 | -1 | 1 | 1 | 0 | -1 |  1 |  1 | -1 | -1 | 1 |  1 | -1 | 5 | 4 | 3 | 1 | 1 | 5 |  0 | 12 | 14 | 15 |
+| 1 |  1 | 15 |  1 | -1 |  1 | 2 | 3 | -1 | -1 | -1 | -1 |  1 | -1 | -1 | -1 | -1 |  1 | -1 | -1 | -1 |  1 | -1 |  1 | -1 | 2 | 1 | 0 | -1 |  1 | -1 |  1 |  1 | 1 | -1 | -1 | 3 | 5 | 1 | 1 | 1 | 5 |  0 |  8 |  7 |  6 |
+| 1 | -1 | 15 |  1 |  1 |  1 | 4 | 3 |  1 | -1 | -1 | -1 | -1 | -1 | -1 |  1 | -1 | -1 |  1 | -1 | -1 | -1 |  1 | -1 | -1 | 1 | 3 | 0 | -1 |  1 | -1 |  1 |  1 | 1 |  1 | -1 | 5 | 4 | 3 | 1 | 1 | 4 |  2 | 15 | 16 | 18 |
+| 1 | -1 | 16 | -1 | -1 | -1 | 4 | 4 | -1 | -1 | -1 | -1 |  1 |  1 | -1 | -1 | -1 | -1 | -1 |  1 | -1 | -1 |  1 | -1 | -1 | 2 | 3 | 0 | -1 |  1 | -1 |  1 |  1 | 1 |  1 |  1 | 2 | 4 | 3 | 1 | 1 | 5 |  7 | 15 | 16 | 15 |
+| 1 |  1 | 15 | -1 | -1 |  1 | 3 | 4 | -1 | -1 |  1 | -1 | -1 | -1 |  1 | -1 | -1 | -1 | -1 | -1 |  1 | -1 |  1 | -1 | -1 | 1 | 3 | 0 |  1 |  1 |  1 |  1 |  1 | 1 |  1 | -1 | 4 | 3 | 2 | 1 | 1 | 5 |  2 | 12 | 12 | 11 |
+| 1 |  1 | 15 | -1 | -1 |  1 | 2 | 2 | -1 | -1 | -1 |  1 | -1 | -1 | -1 | -1 | -1 |  1 | -1 |  1 | -1 | -1 |  1 | -1 | -1 | 1 | 1 | 0 |  1 |  1 |  1 |  1 |  1 | 1 | -1 | -1 | 4 | 3 | 1 | 1 | 1 | 2 |  8 | 14 | 13 | 13 |
+| 1 |  1 | 16 |  1 |  1 |  1 | 2 | 2 | -1 | -1 | -1 | -1 |  1 | -1 | -1 | -1 | -1 |  1 |  1 | -1 | -1 | -1 |  1 | -1 | -1 | 2 | 2 | 1 | -1 |  1 | -1 |  1 | -1 | 1 |  1 |  1 | 3 | 3 | 3 | 1 | 2 | 3 | 25 |  7 | 10 | 11 |
+| 1 | -1 | 15 |  1 |  1 |  1 | 4 | 4 |  1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 |  1 |  1 | -1 | -1 | -1 | -1 | -1 |  1 | 1 | 1 | 0 | -1 |  1 | -1 | -1 | -1 | 1 |  1 |  1 | 5 | 4 | 3 | 2 | 4 | 5 |  8 | 12 | 12 | 12 |
+| 1 | -1 | 15 |  1 | -1 |  1 | 4 | 4 | -1 | -1 |  1 | -1 | -1 |  1 | -1 | -1 | -1 | -1 | -1 | -1 |  1 | -1 | -1 |  1 | -1 | 1 | 2 | 0 | -1 |  1 | -1 |  1 |  1 | 1 |  1 | -1 | 4 | 3 | 3 | 1 | 1 | 5 |  2 | 19 | 18 | 18 |
+| 1 | -1 | 15 |  1 | -1 |  1 | 2 | 2 | -1 | -1 |  1 | -1 | -1 | -1 | -1 |  1 | -1 | -1 | -1 | -1 |  1 | -1 | -1 |  1 | -1 | 1 | 1 | 0 |  1 |  1 | -1 | -1 |  1 | 1 |  1 | -1 | 5 | 4 | 1 | 1 | 1 | 1 |  0 |  8 |  8 | 11 |
+| 1 |  1 | 16 |  1 |  1 |  1 | 2 | 2 | -1 | -1 | -1 | -1 |  1 | -1 | -1 | -1 |  1 | -1 | -1 | -1 |  1 | -1 | -1 |  1 | -1 | 2 | 2 | 1 |  1 | -1 | -1 |  1 |  1 | 1 |  1 | -1 | 4 | 3 | 3 | 2 | 2 | 5 | 14 | 10 | 10 |  9 |
+| 1 |  1 | 15 |  1 |  1 | -1 | 4 | 3 | -1 | -1 | -1 | -1 |  1 | -1 | -1 | -1 | -1 |  1 | -1 | -1 |  1 | -1 |  1 | -1 | -1 | 1 | 2 | 0 |  1 |  1 |  1 |  1 |  1 | 1 |  1 |  1 | 5 | 2 | 2 | 1 | 1 | 5 |  8 |  8 |  8 |  6 |
+| 1 |  1 | 16 |  1 |  1 | -1 | 3 | 3 | -1 | -1 | -1 | -1 |  1 | -1 | -1 |  1 | -1 | -1 |  1 | -1 | -1 | -1 |  1 | -1 | -1 | 1 | 2 | 0 | -1 |  1 | -1 | -1 |  1 | 1 |  1 | -1 | 2 | 3 | 5 | 1 | 4 | 3 | 12 | 11 | 12 | 11 |
+| 1 | -1 | 16 |  1 | -1 |  1 | 4 | 3 | -1 |  1 | -1 | -1 | -1 | -1 | -1 |  1 | -1 | -1 | -1 |  1 | -1 | -1 |  1 | -1 | -1 | 1 | 4 | 0 | -1 | -1 | -1 |  1 |  1 | 1 |  1 | -1 | 4 | 2 | 2 | 1 | 1 | 2 |  4 | 19 | 19 | 20 |
+| 1 | -1 | 15 |  1 | -1 |  1 | 4 | 2 |  1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 |  1 |  1 | -1 | -1 | -1 |  1 | -1 | -1 | 1 | 2 | 0 | -1 |  1 |  1 | -1 |  1 | 1 | -1 | -1 | 4 | 3 | 3 | 2 | 2 | 5 |  2 | 15 | 15 | 14 |
+
+* 2. (10 pontos)
+Converta todos os atributos da base Forest Fires para numéricos.
+https://archive.ics.uci.edu/ml/datasets/Forest+Fires
+
+#+BEGIN_SRC bash
+wget -nc https://archive.ics.uci.edu/ml/machine-learning-databases/forest-fires/forestfires.csv #baixa se necessario
+#file forestfires.csv
+bat forestfires.csv
+#+END_SRC
+
+#+BEGIN_SRC python
+arq_lista = open("forestfires.csv", "r")
+linhas = list(map(lambda linha : linha.replace("\n", ""), arq_lista.readlines()))
+linhas = list(map(lambda linha: linha.split(','), linhas))
+linhas.reverse()
+cabecalho = linhas.pop()
+linhas.reverse()
+
+linhas = linhas[:len(linhas)//8]
+novas_linhas = []
+
+for linha in linhas:
+  nova_linha = []
+
+  #copia o 1 e o 2
+  nova_linha.append(linha[1 - 1])
+  nova_linha.append(linha[2 - 1])
+
+  # dado ciclico
+  from math import sin
+  from math import cos
+  tupla_mes = lambda idx_mes : (sin(6.28 * float(idx_mes)/12.0), cos(6.28 * float(idx_mes)/12.0))
+  tupla_dia = lambda idx_dia : (sin(6.28 * float(idx_dia)/7.0), cos(6.28 * float(idx_dia)/7.0))
+
+  mes = linha[2]
+  dia = linha[3]
+
+  dict_mes = {
+    "jan" : 1,
+    "feb" : 2,
+    "mar" : 3,
+    "apr" : 4,
+    "may" : 5,
+    "jun" : 6,
+    "jul" : 7,
+    "aug" : 8,
+    "sep" : 9,
+    "oct" : 10,
+    "nov" : 11,
+    "dec" : 12,
+  }
+  
+  dict_dia = {
+    "sun" : 1,
+    "mon" : 2,
+    "tue" : 3,
+    "wed" : 4,
+    "thu" : 5,
+    "fri" : 6,
+    "sat" : 7,
+  }
+
+  sen_mes, cos_mes = tupla_mes(dict_mes.get(mes))
+  sen_dia, cos_dia = tupla_dia(dict_dia.get(dia))
+
+  
+  nova_linha.append(sen_mes)
+  nova_linha.append(cos_mes)
+  nova_linha.append(sen_dia)
+  nova_linha.append(cos_dia)
+
+
+  #copia o resto
+  for idx in range(4, len(linha)):
+    nova_linha.append(linha[idx])
+  novas_linhas.append(nova_linha)
+
+
+return novas_linhas
+#+END_SRC
+
+#+RESULTS:
+| 7 | 5 |    0.9999996829318346 |  0.0007963267107332633 |     -0.783530857658933 |   0.6213528748595735 | 86.2 |  26.2 |  94.3 |  5.1 |  8.2 | 51 | 6.7 |   0 | 0 |
+| 7 | 4 |   -0.8673495625624736 |    0.49769944376368924 |    0.43511327556190843 |  -0.9003757201467545 | 90.6 |  35.4 | 669.1 |  6.7 |   18 | 33 | 0.9 |   0 | 0 |
+| 7 | 4 |   -0.8673495625624736 |    0.49769944376368924 | -0.0031853017931379904 |   0.9999949269133752 | 90.6 |  43.7 | 686.9 |  6.7 | 14.6 | 33 | 1.3 |   0 | 0 |
+| 8 | 6 |    0.9999996829318346 |  0.0007963267107332633 |     -0.783530857658933 |   0.6213528748595735 | 91.7 |  33.3 |  77.5 |    9 |  8.3 | 97 |   4 | 0.2 | 0 |
+| 8 | 6 |    0.9999996829318346 |  0.0007963267107332633 |      0.781547686312557 |   0.6238455049284951 | 89.3 |  51.3 | 102.2 |  9.6 | 11.4 | 99 | 1.8 |   0 | 0 |
+| 8 | 6 |   -0.8649616828896994 |    -0.5018379092223095 |      0.781547686312557 |   0.6238455049284951 | 92.3 |  85.3 |   488 | 14.7 | 22.2 | 29 | 5.4 |   0 | 0 |
+| 8 | 6 |   -0.8649616828896994 |    -0.5018379092223095 |     0.9751300219867084 | -0.22163357196102196 | 92.3 |  88.9 | 495.6 |  8.5 | 24.1 | 27 | 3.1 |   0 | 0 |
+| 8 | 6 |   -0.8649616828896994 |    -0.5018379092223095 |     0.9751300219867084 | -0.22163357196102196 | 91.5 | 145.4 | 608.2 | 10.7 |    8 | 86 | 2.2 |   0 | 0 |
+| 8 | 6 |    -0.999997146387718 | -0.0023889781122815386 |    0.43511327556190843 |  -0.9003757201467545 |   91 | 129.5 | 692.6 |    7 | 13.1 | 63 | 5.4 |   0 | 0 |
+| 7 | 5 |    -0.999997146387718 | -0.0023889781122815386 | -0.0031853017931379904 |   0.9999949269133752 | 92.5 |    88 | 698.6 |  7.1 | 22.8 | 40 |   4 |   0 | 0 |
+| 7 | 5 |    -0.999997146387718 | -0.0023889781122815386 | -0.0031853017931379904 |   0.9999949269133752 | 92.5 |    88 | 698.6 |  7.1 | 17.8 | 51 | 7.2 |   0 | 0 |
+| 7 | 5 |    -0.999997146387718 | -0.0023889781122815386 | -0.0031853017931379904 |   0.9999949269133752 | 92.8 |  73.2 |   713 | 22.6 | 19.3 | 38 |   4 |   0 | 0 |
+| 6 | 5 |   -0.8649616828896994 |    -0.5018379092223095 |     -0.783530857658933 |   0.6213528748595735 | 63.5 |  70.8 | 665.3 |  0.8 |   17 | 72 | 6.7 |   0 | 0 |
+| 6 | 5 |    -0.999997146387718 | -0.0023889781122815386 |     0.9751300219867084 | -0.22163357196102196 | 90.9 | 126.5 | 686.5 |    7 | 21.3 | 42 | 2.2 |   0 | 0 |
+| 6 | 5 |    -0.999997146387718 | -0.0023889781122815386 |   -0.43224309979868814 |   -0.901757119559597 | 92.9 | 133.3 | 699.6 |  9.2 | 26.4 | 21 | 4.5 |   0 | 0 |
+| 6 | 5 |    -0.999997146387718 | -0.0023889781122815386 |     -0.783530857658933 |   0.6213528748595735 | 93.3 | 141.2 | 713.9 | 13.9 | 22.9 | 44 | 5.4 |   0 | 0 |
+| 5 | 5 |    0.9999996829318346 |  0.0007963267107332633 | -0.0031853017931379904 |   0.9999949269133752 | 91.7 |  35.8 |  80.8 |  7.8 | 15.1 | 27 | 5.4 |   0 | 0 |
+| 8 | 5 |   -0.8673495625624736 |    0.49769944376368924 |     0.9751300219867084 | -0.22163357196102196 | 84.9 |  32.8 | 664.2 |    3 | 16.7 | 47 | 4.9 |   0 | 0 |
+| 6 | 4 |    0.9999996829318346 |  0.0007963267107332633 |   -0.43224309979868814 |   -0.901757119559597 | 89.2 |  27.9 |  70.8 |  6.3 | 15.9 | 35 |   4 |   0 | 0 |
+| 6 | 4 |    0.8665558000562658 |    -0.4990801993556198 | -0.0031853017931379904 |   0.9999949269133752 | 86.3 |  27.4 |  97.1 |  5.1 |  9.3 | 44 | 4.5 |   0 | 0 |
+| 6 | 4 |    -0.999997146387718 | -0.0023889781122815386 |    0.43511327556190843 |  -0.9003757201467545 |   91 | 129.5 | 692.6 |    7 | 18.3 | 40 | 2.7 |   0 | 0 |
+| 5 | 4 |    -0.999997146387718 | -0.0023889781122815386 |     0.9751300219867084 | -0.22163357196102196 | 91.8 |  78.5 | 724.3 |  9.2 | 19.1 | 38 | 2.7 |   0 | 0 |
+| 7 | 4 | 0.0015926529164868282 |    -0.9999987317275395 |      0.781547686312557 |   0.6238455049284951 | 94.3 |  96.3 |   200 | 56.1 |   21 | 44 | 4.5 |   0 | 0 |
+| 7 | 4 |   -0.8649616828896994 |    -0.5018379092223095 | -0.0031853017931379904 |   0.9999949269133752 | 90.2 | 110.9 | 537.4 |  6.2 | 19.5 | 43 | 5.8 |   0 | 0 |
+| 7 | 4 |   -0.8649616828896994 |    -0.5018379092223095 | -0.0031853017931379904 |   0.9999949269133752 | 93.5 | 139.4 | 594.2 | 20.3 | 23.7 | 32 | 5.8 |   0 | 0 |
+| 7 | 4 |   -0.8649616828896994 |    -0.5018379092223095 |      0.781547686312557 |   0.6238455049284951 | 91.4 | 142.4 | 601.4 | 10.6 | 16.3 | 60 | 5.4 |   0 | 0 |
+| 7 | 4 |    -0.999997146387718 | -0.0023889781122815386 |     -0.783530857658933 |   0.6213528748595735 | 92.4 | 117.9 |   668 | 12.2 |   19 | 34 | 5.8 |   0 | 0 |
+| 7 | 4 |    -0.999997146387718 | -0.0023889781122815386 |     0.9751300219867084 | -0.22163357196102196 | 90.9 | 126.5 | 686.5 |    7 | 19.4 | 48 | 1.3 |   0 | 0 |
+| 6 | 3 |    -0.999997146387718 | -0.0023889781122815386 | -0.0031853017931379904 |   0.9999949269133752 | 93.4 | 145.4 | 721.4 |  8.1 | 30.2 | 24 | 2.7 |   0 | 0 |
+| 6 | 3 |    -0.999997146387718 | -0.0023889781122815386 |      0.781547686312557 |   0.6238455049284951 | 93.5 | 149.3 | 728.6 |  8.1 | 22.8 | 39 | 3.6 |   0 | 0 |
+| 6 | 3 |    -0.999997146387718 | -0.0023889781122815386 |     -0.783530857658933 |   0.6213528748595735 | 94.3 |  85.1 | 692.3 | 15.9 | 25.4 | 24 | 3.6 |   0 | 0 |
+| 6 | 3 |    -0.999997146387718 | -0.0023889781122815386 |     0.9751300219867084 | -0.22163357196102196 | 88.6 |  91.8 | 709.9 |  7.1 | 11.2 | 78 | 7.6 |   0 | 0 |
+| 6 | 3 |    -0.999997146387718 | -0.0023889781122815386 |     -0.783530857658933 |   0.6213528748595735 | 88.6 |  69.7 | 706.8 |  5.8 | 20.6 | 37 | 1.8 |   0 | 0 |
+| 6 | 3 |    -0.999997146387718 | -0.0023889781122815386 |      0.781547686312557 |   0.6238455049284951 | 91.7 |  75.6 | 718.3 |  7.8 | 17.7 | 39 | 3.6 |   0 | 0 |
+| 6 | 3 |    -0.999997146387718 | -0.0023889781122815386 |     0.9751300219867084 | -0.22163357196102196 | 91.8 |  78.5 | 724.3 |  9.2 | 21.2 | 32 | 2.7 |   0 | 0 |
+| 6 | 3 |    -0.999997146387718 | -0.0023889781122815386 |    0.43511327556190843 |  -0.9003757201467545 | 90.3 |  80.7 | 730.2 |  6.3 | 18.2 | 62 | 4.5 |   0 | 0 |
+| 6 | 3 |   -0.8673495625624736 |    0.49769944376368924 |    0.43511327556190843 |  -0.9003757201467545 | 90.6 |  35.4 | 669.1 |  6.7 | 21.7 | 24 | 4.5 |   0 | 0 |
+| 7 | 4 |   -0.8673495625624736 |    0.49769944376368924 |     -0.783530857658933 |   0.6213528748595735 |   90 |  41.5 | 682.6 |  8.7 | 11.3 | 60 | 5.4 |   0 | 0 |
+| 7 | 3 |   -0.8673495625624736 |    0.49769944376368924 | -0.0031853017931379904 |   0.9999949269133752 | 90.6 |  43.7 | 686.9 |  6.7 | 17.8 | 27 |   4 |   0 | 0 |
+| 4 | 4 |    0.9999996829318346 |  0.0007963267107332633 |    0.43511327556190843 |  -0.9003757201467545 | 88.1 |  25.7 |  67.6 |  3.8 | 14.1 | 43 | 2.7 |   0 | 0 |
+| 4 | 4 |   -0.4983899795832512 |    -0.8669529561925529 |    0.43511327556190843 |  -0.9003757201467545 | 79.5 |  60.6 | 366.7 |  1.5 | 23.3 | 37 | 3.1 |   0 | 0 |
+| 4 | 4 |   -0.8649616828896994 |    -0.5018379092223095 | -0.0031853017931379904 |   0.9999949269133752 | 90.2 |  96.9 | 624.2 |  8.9 | 18.4 | 42 | 6.7 |   0 | 0 |
+| 4 | 4 |   -0.8649616828896994 |    -0.5018379092223095 |    0.43511327556190843 |  -0.9003757201467545 | 94.8 | 108.3 | 647.1 |   17 | 16.6 | 54 | 5.4 |   0 | 0 |
+| 4 | 4 |    -0.999997146387718 | -0.0023889781122815386 | -0.0031853017931379904 |   0.9999949269133752 | 92.5 |    88 | 698.6 |  7.1 | 19.6 | 48 | 2.7 |   0 | 0 |
+| 4 | 4 |    -0.999997146387718 | -0.0023889781122815386 |   -0.43224309979868814 |   -0.901757119559597 | 90.1 |  82.9 | 735.7 |  6.2 | 12.9 | 74 | 4.9 |   0 | 0 |
+| 5 | 6 |    -0.999997146387718 | -0.0023889781122815386 |   -0.43224309979868814 |   -0.901757119559597 | 94.3 |  85.1 | 692.3 | 15.9 | 25.9 | 24 |   4 |   0 | 0 |
+| 5 | 6 |    -0.999997146387718 | -0.0023889781122815386 |     0.9751300219867084 | -0.22163357196102196 | 90.9 | 126.5 | 686.5 |    7 | 14.7 | 70 | 3.6 |   0 | 0 |
+| 6 | 6 |   -0.4983899795832512 |    -0.8669529561925529 |     0.9751300219867084 | -0.22163357196102196 | 94.2 |  62.3 | 442.9 |   11 |   23 | 36 | 3.1 |   0 | 0 |
+| 4 | 4 |    0.9999996829318346 |  0.0007963267107332633 |     0.9751300219867084 | -0.22163357196102196 | 87.2 |  23.9 |  64.7 |  4.1 | 11.8 | 35 | 1.8 |   0 | 0 |
+| 4 | 4 |    0.9999996829318346 |  0.0007963267107332633 |     0.9751300219867084 | -0.22163357196102196 | 87.6 |  52.2 | 103.8 |    5 |   11 | 46 | 5.8 |   0 | 0 |
+| 4 | 4 |    -0.999997146387718 | -0.0023889781122815386 |    -0.9744191052534494 |  -0.2247385310022896 | 92.9 |   137 | 706.4 |  9.2 | 20.8 | 17 | 1.3 |   0 | 0 |
+| 4 | 3 |   -0.8649616828896994 |    -0.5018379092223095 |      0.781547686312557 |   0.6238455049284951 | 90.2 |  99.6 | 631.2 |  6.3 | 21.5 | 34 | 2.2 |   0 | 0 |
+| 4 | 3 |   -0.8649616828896994 |    -0.5018379092223095 |   -0.43224309979868814 |   -0.901757119559597 | 92.1 | 111.2 | 654.1 |  9.6 | 20.4 | 42 | 4.9 |   0 | 0 |
+| 4 | 3 |   -0.8649616828896994 |    -0.5018379092223095 |   -0.43224309979868814 |   -0.901757119559597 | 92.1 | 111.2 | 654.1 |  9.6 | 20.4 | 42 | 4.9 |   0 | 0 |
+| 4 | 3 |   -0.8649616828896994 |    -0.5018379092223095 |    -0.9744191052534494 |  -0.2247385310022896 | 91.7 | 114.3 | 661.3 |  6.3 | 17.6 | 45 | 3.6 |   0 | 0 |
+| 4 | 3 |    -0.999997146387718 | -0.0023889781122815386 |    -0.9744191052534494 |  -0.2247385310022896 | 92.9 |   137 | 706.4 |  9.2 | 27.7 | 24 | 2.2 |   0 | 0 |
+| 4 | 3 |    -0.999997146387718 | -0.0023889781122815386 |    0.43511327556190843 |  -0.9003757201467545 | 90.3 |  80.7 | 730.2 |  6.3 | 17.8 | 63 | 4.9 |   0 | 0 |
+| 4 | 3 |   -0.8673495625624736 |    0.49769944376368924 |      0.781547686312557 |   0.6238455049284951 | 92.6 |  46.5 | 691.8 |  8.8 | 13.8 | 50 | 2.7 |   0 | 0 |
+| 2 | 2 |    0.8657598394923444 |     0.5004596890082058 |     0.9751300219867084 | -0.22163357196102196 |   84 |   9.3 |    34 |  2.1 | 13.9 | 40 | 5.4 |   0 | 0 |
+| 2 | 2 |    0.8657598394923444 |     0.5004596890082058 |     -0.783530857658933 |   0.6213528748595735 | 86.6 |  13.2 |    43 |  5.3 | 12.3 | 51 | 0.9 |   0 | 0 |
+| 2 | 2 |    0.9999996829318346 |  0.0007963267107332633 |      0.781547686312557 |   0.6238455049284951 | 89.3 |  51.3 | 102.2 |  9.6 | 11.5 | 39 | 5.8 |   0 | 0 |
+| 2 | 2 |    0.9999996829318346 |  0.0007963267107332633 |      0.781547686312557 |   0.6238455049284951 | 89.3 |  51.3 | 102.2 |  9.6 |  5.5 | 59 | 6.3 |   0 | 0 |
+| 2 | 2 |   -0.8649616828896994 |    -0.5018379092223095 |    -0.9744191052534494 |  -0.2247385310022896 |   93 |  75.3 | 466.6 |  7.7 | 18.8 | 35 | 4.9 |   0 | 0 |
+| 2 | 2 |   -0.8649616828896994 |    -0.5018379092223095 |      0.781547686312557 |   0.6238455049284951 | 90.2 |  99.6 | 631.2 |  6.3 | 20.8 | 33 | 2.7 |   0 | 0 |
+
+* 3. (15 pontos)
+Converta a base Car Evaluation de modo que esta possa ser utilizada em um experimento do tipo
+Holdout 50/50 estraticado com o classicador 1-NN utilizando distância Euclidiana. Calcule a
+taxa de acerto do classicador.
+https://archive.ics.uci.edu/ml/datasets/Car+Evaluation
+
+#+BEGIN_SRC bash
+wget -nc https://archive.ics.uci.edu/ml/machine-learning-databases/car/car.data #baixa se necessario
+#+END_SRC
+
+#+BEGIN_SRC python
+  arq_lista = open("car.data", "r")
+  linhas = list(map(lambda linha : linha.replace("\n", ""), arq_lista.readlines()))
+  linhas = list(map(lambda linha: linha.split(','), linhas))
+  linhas.reverse()
+  cabecalho = linhas.pop()
+  linhas.reverse()
+
+  novas_linhas = []
+
+  dict_niveis_de_custo = {
+    "vhigh" : 4,
+    "high" : 3,
+    "med" : 2,
+    "low" : 1,
+  }
+
+  dict_portas = {
+    "5more" : 5,
+    "4" : 4,
+    "3" : 3,
+    "2" : 2
+  }
+
+  dict_pessoas = {
+    "more" : 3,
+    "4" : 2,
+    "2" : 1,
+  }
+
+  dict_porta_malas = {
+    "big" : 3,
+    "med" : 2,
+    "small" : 1,
+  }
+
+  dict_seguranca = {
+    "high" : 3,
+    "med" : 2,
+    "low" : 1,
+  }
+
+  dicts_em_ordem = []
+  dicts_em_ordem.append(dict_niveis_de_custo)
+  dicts_em_ordem.append(dict_niveis_de_custo)
+  dicts_em_ordem.append(dict_portas)
+  dicts_em_ordem.append(dict_pessoas)
+  dicts_em_ordem.append(dict_porta_malas)
+  dicts_em_ordem.append(dict_seguranca)
+
+  novas_linhas = []
+  for linha in linhas:
+    linha_atributo = zip(linha, dicts_em_ordem)
+    nova_linha = list(map(lambda dupla : dupla[1].get(dupla[0]), list(linha_atributo)))
+    nova_linha.append(linha[len(linha) - 1])
+    novas_linhas.append(nova_linha)
+
+  xs = list(map(lambda e : e[:-1], novas_linhas))
+  ys = list(map(lambda e : e[-1], novas_linhas))
+
+
+  from sklearn.model_selection import train_test_split
+  #X_train, X_test, y_train, y_test = train_test_split(xs, ys, test_size=0.5, stratify=ys, random_state=8)
+  X_train, X_test, y_train, y_test = train_test_split(xs, ys, test_size=0.5, stratify=ys)
+  from sklearn.neighbors import KNeighborsClassifier
+  knn = KNeighborsClassifier(n_neighbors=1, algorithm="brute", metric="minkowski", p=2)
+  knn.fit(X_train, y_train)
+  return knn.score(X_test, y_test)
+
+  return X_train
+#+END_SRC
+
+#+RESULTS:
+: 0.8333333333333334
+
+* 4. (15 pontos)
+Converta os atributos numéricos para atributos categóricos da base Iris. Então realize um
+experimento do tipo Holdout 50/50 estraticado para calcular a taxa de acerto na base transformada
+utilizando o classicador Árvore de Decisão.
+https://archive.ics.uci.edu/ml/datasets/Iris
+
+
+#+BEGIN_SRC bash
+wget -nc https://archive.ics.uci.edu/ml/machine-learning-databases/iris/iris.data #baixa se necessario
+#+END_SRC
+
+max no awk:
+awk 'NR==1{max = $1 + 0; next} {if ($1 > max) max = $1;} END {print max}'
+
+#+BEGIN_SRC python
+
+  arq_lista = open("iris.data", "r")
+  linhas = list(map(lambda linha : linha.replace("\n", ""), arq_lista.readlines()))
+  linhas = list(map(lambda linha: linha.split(','), linhas))
+  linhas.pop()
+
+  def tentar_float(flt):
+      try:
+          return float(flt)
+      except:
+          return flt
+
+  novas_linhas = []
+  for linha in linhas:
+      novas_linhas.append(list(map(lambda a : tentar_float(a), linha)))
+  linhas = novas_linhas
+
+
+  num_intervalos = 10
+  eps = 0.1
+  attrs = []
+  attrs.append(list(map(lambda a : a[0], linhas)))
+  attrs.append(list(map(lambda a : a[1], linhas)))
+  attrs.append(list(map(lambda a : a[2], linhas)))
+  attrs.append(list(map(lambda a : a[3], linhas)))
+
+  maxs = list(map(lambda a : max(a), attrs))
+  mins = list(map(lambda a : min(a), attrs))
+  mins_maxs = zip(mins, maxs)
+  tamanhos_de_intervalos = list(map(lambda minn_maxx : (list(minn_maxx)[1] - list(minn_maxx)[0])/num_intervalos, mins_maxs))
+
+  for linha in linhas:
+      for num_attr in range(len(attrs)):
+          val = linha[num_attr]
+          tamanho_intervalo = tamanhos_de_intervalos[num_attr]
+          minx = mins[num_attr] - eps
+          novo_val = -10000000
+          for intervalo in range(num_intervalos+1):
+              limite_inferior = (minx + (intervalo*tamanho_intervalo))
+              limite_superior = (minx + ((intervalo+1)*tamanho_intervalo))
+              if val > limite_inferior and val <= limite_superior:
+                  #novo_val = "classe_" +str(intervalo+1)
+                  novo_val = intervalo+1
+                  break
+          linha[num_attr] = novo_val
+
+
+  xs = list(map(lambda a : a[:-1], linhas))
+  ys = list(map(lambda a : a[-1], linhas))
+
+  # pra usar no sklearn tem que deixa em numero, nesse caso em int
+  from sklearn.tree import DecisionTreeClassifier
+  from sklearn.model_selection import train_test_split
+  X_train, X_test, y_train, y_test = train_test_split(xs, ys, test_size=0.5, stratify=ys)
+  arvore = DecisionTreeClassifier()
+  arvore.fit(X_train, y_train)
+  return arvore.score(X_test, y_test)
+
+#+END_SRC
+
+#+RESULTS:
+: 0.96
+
+* 5. (15 pontos)
+A base Adult possui alguns valores de atributos omissos. Realize o experimento descrito abaixo
+utilizando o classicador Árvore de Decisão.
+https://archive.ics.uci.edu/ml/machine-learning-databases/adult/adult.data
+https://archive.ics.uci.edu/ml/datasets/Adult
+ (a) Divida a base em treino (50%) e teste de forma estraticada. Determine como preencher os valores omissos dos atributos utilizando apenas o conjunto de treinamento.
+ (b) Preencha os valores omissos no conjunto de treino.
+ (c) Preencha os valores omissos no conjunto de teste utilizando o método e os valores denidos para o conjunto de treino.
+ (d) Calcule a taxa de acerto do classicador.
+
+
+#+BEGIN_SRC bash
+wget -nc https://archive.ics.uci.edu/ml/machine-learning-databases/adult/adult.data #baixa se necessario
+wget -nc https://archive.ics.uci.edu/ml/machine-learning-databases/adult/adult.names #baixa se necessario
+#+END_SRC
+
+use pra descobrir as colunas q tem dado faltando
+>>> bat adult.data | awk -F, '{print $3}' | grep "?" 
+
+#+BEGIN_SRC python
+  arq_lista = open("adult.data", "r")
+  linhas = list(map(lambda linha : linha.replace("\n", ""), arq_lista.readlines()))
+  linhas = list(map(lambda linha: linha.split(', '), linhas))
+  linhas.pop()
+
+  xs = list(map(lambda a : a[:-1], linhas))
+  ys = list(map(lambda a : a[-1], linhas))
+  rng = 463
+  from sklearn.model_selection import train_test_split
+  X_train, X_test, y_train, y_test = train_test_split(xs, ys, test_size=0.5, stratify=ys, random_state=rng)
+
+
+  subs = []
+  import statistics
+
+  subs.append(statistics.mean(list(map(lambda linha : float(linha[0]), X_train))))
+  subs.append(statistics.mode(list(map(lambda linha : linha[1], X_train))))
+  subs.append(statistics.mean(list(map(lambda linha : float(linha[2]), X_train))))
+  subs.append(statistics.mode(list(map(lambda linha : linha[3], X_train))))
+  subs.append(statistics.mean(list(map(lambda linha : float(linha[4]), X_train))))
+  subs.append(statistics.mode(list(map(lambda linha : linha[5], X_train))))
+  subs.append(statistics.mode(list(map(lambda linha : linha[6], X_train))))
+  subs.append(statistics.mode(list(map(lambda linha : linha[7], X_train))))
+  subs.append(statistics.mode(list(map(lambda linha : linha[8], X_train))))
+  subs.append(statistics.mode(list(map(lambda linha : linha[9], X_train))))
+  subs.append(statistics.mean(list(map(lambda linha : float(linha[10]), X_train))))
+  subs.append(statistics.mean(list(map(lambda linha : float(linha[11]), X_train))))
+  subs.append(statistics.mean(list(map(lambda linha : float(linha[12]), X_train))))
+  subs.append(statistics.mode(list(map(lambda linha : linha[13], X_train))))
+
+
+  def subs_attr(tupla_idx_val):
+      idx, val = tupla_idx_val
+      if val == "?": return subs[idx]
+      return val
+
+  # substitui tudo de uma vez e usa o mesmo random state pra pegar o mesmo conjunto de dados
+  subs_linha = lambda linha : list(map(lambda tupla_idx_val_attr : subs_attr(tupla_idx_val_attr), enumerate(linha)))
+  linhas = list(map(lambda linha : subs_linha(linha), linhas))
+
+
+  xs = list(map(lambda a : a[:-1], linhas))
+  ys = list(map(lambda a : a[-1], linhas))
+
+
+  # primeiro todo mundo que é float pra float e string pra string
+  for idx_x in range(len(xs)):
+      xs[idx_x][0] = float(xs[idx_x][0])
+      xs[idx_x][1] = str(xs[idx_x][1])
+      xs[idx_x][2] = float(xs[idx_x][2])
+      xs[idx_x][3] = str(xs[idx_x][3])
+      xs[idx_x][4] = float(xs[idx_x][4])
+      xs[idx_x][5] = str(xs[idx_x][5])
+      xs[idx_x][6] = str(xs[idx_x][6])
+      xs[idx_x][7] = str(xs[idx_x][7])
+      xs[idx_x][8] = str(xs[idx_x][8])
+      xs[idx_x][9] = str(xs[idx_x][9])
+      xs[idx_x][10] = float(xs[idx_x][10])
+      xs[idx_x][11] = float(xs[idx_x][11])
+      xs[idx_x][12] = float(xs[idx_x][12])
+      xs[idx_x][13] = str(xs[idx_x][13])
+
+
+
+  # pra usar no sklearn tem que deixa em numero, nesse caso usar o label encoder da conta
+  from sklearn.preprocessing import LabelEncoder
+  for attr in range(len(xs[0])):
+      lista_attrs = list(map(lambda el : el[attr], xs))
+
+      try:
+          lista_attrs = list(map(lambda el : float(el), lista_attrs))
+      except:
+          le = LabelEncoder()
+          lista_attrs = le.fit_transform(lista_attrs)
+
+      for idx_x in range(len(xs)):
+          xs[idx_x][attr] = lista_attrs[idx_x]
+
+
+
+  X_train, X_test, y_train, y_test = train_test_split(xs, ys, test_size=0.5, stratify=ys, random_state=rng)
+  from sklearn.tree import DecisionTreeClassifier
+  arvore = DecisionTreeClassifier()
+  arvore.fit(X_train, y_train)
+  return arvore.score(X_test, y_test)
+  # 180211 el de teste
+#+END_SRC
+
+#+RESULTS:
+: 0.8068300472943922
+
+* 6. (15 pontos)
+Faça o mesmo da questão anterior para a base Heart Disease (hungarian) utilizando o classicador
+1-NN com distância Euclidiana.
+https://archive.ics.uci.edu/ml/machine-learning-databases/heart-disease/processed.hungarian.data
+https://archive.ics.uci.edu/ml/datasets/Heart+Disease
+Dica: considere remover completemente uma coluna quando o valor deste característica está
+omissa para a maior parte dos exemplos do conjunto de treinamento.
+
+
+#+BEGIN_SRC bash
+wget -nc https://archive.ics.uci.edu/ml/machine-learning-databases/heart-disease/processed.hungarian.data #baixa se necessario
+wget -nc https://archive.ics.uci.edu/ml/machine-learning-databases/heart-disease/heart-disease.names #baixa se necessario
+#+END_SRC
+
+#+BEGIN_SRC python
+  arq_lista = open("processed.hungarian.data", "r")
+  linhas = list(map(lambda linha : linha.replace("\n", ""), arq_lista.readlines()))
+  linhas = list(map(lambda linha: linha.split(','), linhas))
+
+  cnt_omissos = []
+  for attr in range(len(linhas[0])):
+      lista_attrs = list(map(lambda el : el[attr], linhas))
+      cnt_omissos.append(((len(list(filter(lambda el : el == "?", lista_attrs)))), attr))
+
+  cnt_omissos.reverse()
+
+  for cnt, idx in cnt_omissos:
+      if cnt > len(linhas)/2:
+          for idx_linha in range(len(linhas)):
+              linhas[idx_linha] = linhas[idx_linha][:idx] + linhas[idx_linha][idx+1:]
+
+  # daqui pra baixo é o memo
+
+  xs = list(map(lambda a : a[:-1], linhas))
+  ys = list(map(lambda a : a[-1], linhas))
+  rng = 463
+  from sklearn.model_selection import train_test_split
+  X_train, X_test, y_train, y_test = train_test_split(xs, ys, test_size=0.5, stratify=ys, random_state=rng)
+
+  subs = []
+  import statistics
+
+  def media(dt, idx):
+      lista = list(map(lambda el : el[idx], dt))
+      dados = []
+      for dado in lista:
+          if dado != "?":
+              dados.append(float(dado))
+      return sum(dados) / len(dados)
+
+  subs.append(media(X_train, 0))
+  subs.append(statistics.mode(list(map(lambda linha : str(linha[1]), X_train))))
+  subs.append(statistics.mode(list(map(lambda linha : str(linha[2]), X_train))))
+  subs.append(media(X_train, 3))
+  subs.append(media(X_train, 4))
+  subs.append(statistics.mode(list(map(lambda linha : str(linha[5]), X_train))))
+  subs.append(statistics.mode(list(map(lambda linha : str(linha[6]), X_train))))
+  subs.append(media(X_train, 7))
+  subs.append(statistics.mode(list(map(lambda linha : str(linha[8]), X_train))))
+  subs.append(media(X_train, 9))
+
+  def subs_attr(tupla_idx_val):
+      idx, val = tupla_idx_val
+      if val == "?": return subs[idx]
+      return val
+
+  subs_linha = lambda linha : list(map(lambda tupla_idx_val_attr : subs_attr(tupla_idx_val_attr), enumerate(linha)))
+  linhas = list(map(lambda linha : subs_linha(linha), linhas))
+
+  xs = list(map(lambda a : a[:-1], linhas))
+  ys = list(map(lambda a : str(a[-1]), linhas))
+
+  X_train, X_test, y_train, y_test = train_test_split(xs, ys, test_size=0.5, stratify=ys, random_state=rng)
+  from sklearn.neighbors import KNeighborsClassifier
+  knn = KNeighborsClassifier(n_neighbors=1, algorithm="brute", metric="minkowski", p=2)
+  knn.fit(X_train, y_train)
+  return knn.score(X_test, y_test)
+
+#+END_SRC
+
+#+RESULTS:
+: 0.5850340136054422
+
+* 7. (20 pontos)
+Treine uma rede neural MLP por 500 épocas. Este rede tem apenas uma camada escondida 10 neurônios.
+Avalie a taxa de acerto na base Wine com 70% dos dados de cada classe para treino e o restante
+para teste em dois casos distintos:
++ com os casos sem pré-processamento;
++ com cada atributo ajustado para o intervalo (0,1).
+
+
+
+#+BEGIN_SRC bash
+wget -nc http://archive.ics.uci.edu/ml/machine-learning-databases/wine/wine.names #baixa se necessario
+wget -nc http://archive.ics.uci.edu/ml/machine-learning-databases/wine/wine.data #baixa se necessario
+#+END_SRC
+
+#+RESULTS:
+
+#+BEGIN_SRC python
+  arq_lista = open("wine.data", "r")
+  linhas = list(map(lambda linha : linha.replace("\n", ""), arq_lista.readlines()))
+  linhas = list(map(lambda linha: linha.split(','), linhas))
+
+  rng = 463
+
+  xs = list(map(lambda a : a[1:], linhas))
+  ys = list(map(lambda a : str(a[0]), linhas))
+
+
+  from keras.utils import np_utils
+  from sklearn.preprocessing import LabelEncoder
+  encoder = LabelEncoder()
+  encoded_Y = encoder.fit_transform(ys)
+  # tem q mandar pra list pq o tipo dinamico de python é incapaz de inferir ndarray -> list
+  ys = np_utils.to_categorical(encoded_Y).tolist()
+
+  print(type(ys))
+
+  for idx_x in range(len(xs)):
+      xs[idx_x] = list(map(lambda el : float(el), xs[idx_x]))
+
+  xs_ntratado = []
+  for x in xs:
+      xs_ntratado.append(x.copy())
+
+  attrs = []
+  for idx_attr in range(len(xs[0])):
+      attrs.append(list(map(lambda el : float(el[idx_attr]), xs)))
+
+  maxs = list(map(lambda attr : max(attr), attrs))
+  mins = list(map(lambda attr : min(attr), attrs))
+
+  for x in xs:
+      for idx, (imax, imin) in enumerate(zip(maxs, mins)):
+          x[idx] = (x[idx] - imin) / (imax - imin)
+
+  xs_tratado = xs
+
+  from sklearn.model_selection import train_test_split
+  X_train_ntratado, X_test_ntratado, y_train_ntratado, y_test_ntratado = train_test_split(xs_ntratado, ys, test_size=0.3, random_state=rng)
+  X_train_tratado, X_test_tratado, y_train_tratado, y_test_tratado = train_test_split(xs_tratado, ys, test_size=0.3, random_state=rng)
+
+  # tipos_dados[0] é sem tratamento
+  # tipos_dados[1] é com tratamento
+  tipos_dados = []
+
+  tipos_dados.append((X_train_ntratado, X_test_ntratado, y_train_ntratado, y_test_ntratado))
+  tipos_dados.append((X_train_tratado, X_test_tratado, y_train_tratado, y_test_tratado))
+
+  from keras.models import Sequential
+  from keras.layers.core import Dense, Activation
+  from keras.optimizers import Adam
+
+  accs = []
+  for X_train, X_test, y_train, y_test in tipos_dados:
+      nn = Sequential()
+      nn.add(Dense(10, input_dim=13, activation="sigmoid"))
+      nn.add(Dense(3, activation="softmax"))
+      opt = Adam(learning_rate=0.5)
+      nn.compile(optimizer=opt, loss="categorical_crossentropy", metrics=["accuracy"])
+      nn.fit(X_train, y_train, epochs=500, verbose=2)
+      _, accuracy = nn.evaluate(X_test, y_test, verbose=1)
+      accs.append(accuracy)
+
+
+  return accs
+  #acho que deu overfitting nos dados tratados já que chegou em quase 100% no treino
+
+
+  #4/4 - 0s - loss: 0.2697 - accuracy: 0.9274
+  #2/2 [==============================] - 0s 24ms/step - loss: 0.2405 - accuracy: 0.9444
+  #[0.29629629850387573, 0.9444444179534912] na prieira run
+#+END_SRC
+
+#+RESULTS:
+| 0.25925925374031067 | 0.9629629850387573 |
+

@@ -1,0 +1,99 @@
+#    -*- mode: org -*-
+
+
+Archived entries from file /home/sekva/dados/BCC/8P/am/semana_7/ativ.org
+
+
+* 6. (15 pontos)
+  :PROPERTIES:
+  :ARCHIVE_TIME: 2021-01-30 sáb 01:11
+  :ARCHIVE_FILE: ~/dados/BCC/8P/am/semana_7/ativ.org
+  :ARCHIVE_CATEGORY: ativ
+  :END:
+Faça o mesmo da questão anterior para a base Heart Disease (hungarian) utilizando o classicador
+1-NN com distância Euclidiana.
+https://archive.ics.uci.edu/ml/machine-learning-databases/heart-disease/processed.hungarian.data
+https://archive.ics.uci.edu/ml/datasets/Heart+Disease
+Dica: considere remover completemente uma coluna quando o valor deste característica está
+omissa para a maior parte dos exemplos do conjunto de treinamento.
+
+
+#+BEGIN_SRC bash
+wget -nc https://archive.ics.uci.edu/ml/machine-learning-databases/heart-disease/processed.hungarian.data #baixa se necessario
+wget -nc https://archive.ics.uci.edu/ml/machine-learning-databases/heart-disease/heart-disease.names #baixa se necessario
+#+END_SRC
+
+#+RESULTS:
+
+
+#+BEGIN_SRC python
+  arq_lista = open("processed.hungarian.data", "r")
+  linhas = list(map(lambda linha : linha.replace("\n", ""), arq_lista.readlines()))
+  linhas = list(map(lambda linha: linha.split(','), linhas))
+
+  cnt_omissos = []
+  for attr in range(len(linhas[0])):
+      lista_attrs = list(map(lambda el : el[attr], linhas))
+      cnt_omissos.append(((len(list(filter(lambda el : el == "?", lista_attrs)))), attr))
+
+  cnt_omissos.reverse()
+
+  for cnt, idx in cnt_omissos:
+      if cnt > len(linhas)/2:
+          for idx_linha in range(len(linhas)):
+              linhas[idx_linha] = linhas[idx_linha][:idx] + linhas[idx_linha][idx+1:]
+
+
+
+
+  # daqui pra baixo é o memo
+
+  xs = list(map(lambda a : a[:-1], linhas))
+  ys = list(map(lambda a : a[-1], linhas))
+  rng = 463
+  from sklearn.model_selection import train_test_split
+  X_train, X_test, y_train, y_test = train_test_split(xs, ys, test_size=0.5, stratify=ys, random_state=rng)
+
+  subs = []
+  import statistics
+
+  def media(dt, idx):
+      lista = list(map(lambda el : el[idx], dt))
+      dados = []
+      for dado in lista:
+          if dado != "?":
+              dados.append(float(dado))
+      return sum(dados) / len(dados)
+
+  subs.append(media(X_train, 0))
+  subs.append(statistics.mode(list(map(lambda linha : str(linha[1]), X_train))))
+  subs.append(statistics.mode(list(map(lambda linha : str(linha[2]), X_train))))
+  subs.append(media(X_train, 3))
+  subs.append(media(X_train, 4))
+  subs.append(statistics.mode(list(map(lambda linha : str(linha[5]), X_train))))
+  subs.append(statistics.mode(list(map(lambda linha : str(linha[6]), X_train))))
+  subs.append(media(X_train, 7))
+  subs.append(statistics.mode(list(map(lambda linha : str(linha[8]), X_train))))
+  subs.append(media(X_train, 9))
+
+  def subs_attr(tupla_idx_val):
+      idx, val = tupla_idx_val
+      if val == "?": return subs[idx]
+      return val
+
+  subs_linha = lambda linha : list(map(lambda tupla_idx_val_attr : subs_attr(tupla_idx_val_attr), enumerate(linha)))
+  linhas = list(map(lambda linha : subs_linha(linha), linhas))
+
+  xs = list(map(lambda a : a[:-1], linhas))
+  ys = list(map(lambda a : str(a[-1]), linhas))
+
+  X_train, X_test, y_train, y_test = train_test_split(xs, ys, test_size=0.5, stratify=ys, random_state=rng)
+  from sklearn.tree import DecisionTreeClassifier
+  arvore = DecisionTreeClassifier()
+  arvore.fit(X_train, y_train)
+  return arvore.score(X_test, y_test)
+#+END_SRC
+
+#+RESULTS:
+: 0.7414965986394558
+

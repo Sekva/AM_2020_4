@@ -1,4 +1,4 @@
-arq_lista = open("breast-cancer.data", "r")
+arq_lista = open("car.data", "r")
 linhas = list(map(lambda linha : linha.replace("\n", ""), arq_lista.readlines()))
 linhas = list(map(lambda linha: linha.split(','), linhas))
 
