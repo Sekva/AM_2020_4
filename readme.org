@@ -2,6 +2,10 @@
 
 Repositório da disciplina de aprendizado de maquina
 
-[[file:semana_1/ativ.org][Semana 1]]
-[[file:semana_2/ativ.org][Semana 2]]
-[[file:semana_3/ativ.org][Semana 3]]
++ [[file:semana_1/ativ.org][Semana 1]]
++ [[file:semana_2/ativ.org][Semana 2]]
++ [[file:semana_3/ativ.org][Semana 3]]
++ [[file:semana_4/][Semana 4]]
++ [[file:semana_5/ativ.org][Semana 5]]
++ [[file:semana_6/][Semana 6]]
++ [[file:semana_7/ativ.org][Semana 7]]
